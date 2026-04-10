@@ -226,7 +226,7 @@ async function checkAuth() {
   const token = localStorage.getItem('norx-auth-token');
   const email = localStorage.getItem('norx-user-email');
   if (!token || email !== ADMIN_EMAIL) {
-    window.location.href = 'login.html';
+    window.location.href = '/login';
     return false;
   }
   return true;
@@ -398,7 +398,7 @@ function showPage(el) {
 function logout() {
   localStorage.removeItem('norx-auth-token');
   localStorage.removeItem('norx-user-email');
-  window.location.href = 'login.html';
+  window.location.href = '/login';
 }
 
 // Init

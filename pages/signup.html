@@ -72,11 +72,11 @@ input::placeholder{color:var(--text3)}
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo">
+  <a href="/" class="nav-logo">
     <div class="nav-logo-mark"><svg viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#080a0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <div class="nav-logo-text">Norx<span> AI</span></div>
   </a>
-  <div class="nav-right">Already have an account? <a href="login.html">Log in</a></div>
+  <div class="nav-right">Already have an account? <a href="/login">Log in</a></div>
 </nav>
 
 <div class="main">
@@ -352,7 +352,7 @@ async function handleSignup() {
       localStorage.setItem('norx-auth-token', sd.access_token);
       localStorage.setItem('norx-user-plan', betaCodePlan);
       btnText.textContent = 'Beta account created! Redirecting...';
-      window.location.href = 'app.html';
+      window.location.href = '/app';
       return;
     }
 
@@ -404,7 +404,7 @@ async function handleSignup() {
     btnText.textContent = 'Account created! Redirecting...';
     localStorage.setItem('norx-auth-token', accessToken);
     localStorage.setItem('norx-user-plan', selectedPlan);
-    window.location.href = 'app.html';
+    window.location.href = '/app';
 
   } catch (err) {
     showError('Something went wrong. Please try again or contact support.');
