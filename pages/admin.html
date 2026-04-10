@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Norx AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080a0e;--bg2:#0d1017;--bg3:#131720;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#eef0f4;--text2:#7c8494;--text3:#3d4556;--accent:#00d4ff;--accent-dim:rgba(0,212,255,0.08);--accent-border:rgba(0,212,255,0.2);--green:#00e5a0;--green-dim:rgba(0,229,160,0.08);--warn:#ffb347;--warn-dim:rgba(255,179,71,0.08);--danger:#ff5f5f;--danger-dim:rgba(255,95,95,0.08);--purple:#a78bfa;--r:8px;--r-lg:12px;--r-xl:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+.mono{font-family:'JetBrains Mono',monospace}
+.app{display:flex;height:100vh}
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0}
+.logo-wrap{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:30px;height:30px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:15px;height:15px}
+.logo-text{font-size:16px;font-weight:700;letter-spacing:-0.3px}
+.logo-text span{color:var(--accent)}
+.logo-tag{font-size:10px;color:var(--danger);margin-top:2px;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px}
+.nav{flex:1;padding:12px 10px}
+.nav-sec{font-size:9px;font-weight:600;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;padding:0 10px;margin:14px 0 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.15s;border:1px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-border)}
+.nav-icon{width:15px;height:15px;flex-shrink:0}
+.sidebar-bottom{padding:12px 10px;border-top:1px solid var(--border)}
+.admin-badge{background:rgba(255,95,95,0.1);border:1px solid rgba(255,95,95,0.2);border-radius:var(--r);padding:8px 12px;font-size:11px;color:var(--danger);font-family:'JetBrains Mono',monospace;text-align:center}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.page-title{font-size:15px;font-weight:700}
+.topbar-right{display:flex;gap:8px}
+.btn{padding:7px 14px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:'Syne',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s}
+.btn:hover{color:var(--text);background:var(--bg3)}
+.btn-danger{background:var(--danger-dim);color:var(--danger);border-color:rgba(255,95,95,0.25)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.content{flex:1;overflow-y:auto;padding:20px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px}
+.stat-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.stat-val{font-size:24px;font-weight:700;letter-spacing:-1px}
+.stat-sub{font-size:10px;color:var(--text3);margin-top:3px;font-family:'JetBrains Mono',monospace}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
+.card-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:8px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg3);letter-spacing:0.8px;text-transform:uppercase;white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.015)}
+td.primary{color:var(--text);font-weight:500}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;display:inline-block}
+.b-active{background:var(--green-dim);color:var(--green)}.b-active::before{background:var(--green)}
+.b-trial{background:var(--accent-dim);color:var(--accent)}.b-trial::before{background:var(--accent)}
+.b-cancelled{background:var(--danger-dim);color:var(--danger)}.b-cancelled::before{background:var(--danger)}
+.b-past-due{background:var(--warn-dim);color:var(--warn)}.b-past-due::before{background:var(--warn)}
+.b-starter{background:rgba(255,255,255,0.05);color:var(--text2)}
+.b-pro{background:var(--accent-dim);color:var(--accent)}
+.b-agency{background:rgba(167,139,250,0.1);color:var(--purple)}
+.search-row{display:flex;gap:8px;margin-bottom:14px;align-items:center}
+.search-row input,.search-row select{padding:7px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Syne',sans-serif;font-size:13px;outline:none}
+.search-row input{max-width:240px}
+.search-row select{width:auto}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:13px;font-weight:700}
+.mrr-chart{display:flex;align-items:flex-end;gap:6px;height:80px;padding:0 4px;margin-top:8px}
+.mrr-bar{flex:1;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:4px 4px 0 0;min-height:4px;transition:height 0.3s ease;position:relative;cursor:default}
+.mrr-bar:hover{background:rgba(0,212,255,0.2)}
+.mrr-label{font-size:9px;color:var(--text3);text-align:center;margin-top:4px;font-family:'JetBrains Mono',monospace}
+.activity-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.activity-text{color:var(--text2);flex:1}
+.activity-time{color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:10px}
+.loading{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="sidebar">
+  <div class="logo-wrap">
+    <div class="logo">
+      <div class="logo-mark"><svg viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#080a0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div>
+        <div class="logo-text">Norx<span> AI</span></div>
+        <div class="logo-tag">ADMIN PANEL</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-item active" data-page="overview" onclick="showPage(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
+      Overview
+    </div>
+    <div class="nav-item" data-page="users" onclick="showPage(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" fill="currentColor"/><path d="M1 14c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      Users
+    </div>
+    <div class="nav-item" data-page="revenue" onclick="showPage(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><polyline points="1,12 5,7 9,9 15,3" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Revenue
+    </div>
+    <div class="nav-item" data-page="activity" onclick="showPage(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r="0.7" fill="currentColor"/></svg>
+      Activity
+    </div>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="admin-badge">⚠ Admin access only</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="page-title">Overview</div>
+    <div class="topbar-right">
+      <button class="btn btn-sm" onclick="loadData()">↻ Refresh</button>
+      <button class="btn btn-sm" onclick="logout()">Log out</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div id="pg-overview">
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-label">MRR</div><div class="stat-val" style="color:var(--green)" id="stat-mrr">$0</div><div class="stat-sub">monthly recurring</div></div>
+        <div class="stat"><div class="stat-label">Total Users</div><div class="stat-val" style="color:var(--accent)" id="stat-users">0</div><div class="stat-sub" id="stat-users-sub">0 active</div></div>
+        <div class="stat"><div class="stat-label">Trial Users</div><div class="stat-val" style="color:var(--warn)" id="stat-trials">0</div><div class="stat-sub">in 7-day trial</div></div>
+        <div class="stat"><div class="stat-label">Churned</div><div class="stat-val" style="color:var(--danger)" id="stat-churned">0</div><div class="stat-sub">cancelled this month</div></div>
+        <div class="stat"><div class="stat-label">ARR</div><div class="stat-val" id="stat-arr">$0</div><div class="stat-sub">annualized</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Plan Breakdown</div></div>
+          <div style="padding:16px" id="plan-breakdown"></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Recent Activity</div></div>
+          <div style="padding:0 16px" id="admin-activity"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Recent Signups</div></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>User</th><th>Plan</th><th>Status</th><th>Signed up</th><th>MRR</th></tr></thead>
+          <tbody id="recent-signups"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div id="pg-users" style="display:none">
+      <div class="search-row">
+        <input type="text" id="user-search" placeholder="Search by name or email..." oninput="filterUsers()">
+        <select id="user-plan-filter" onchange="filterUsers()">
+          <option value="">All plans</option>
+          <option value="starter">Starter</option>
+          <option value="pro">Pro</option>
+          <option value="agency">Agency</option>
+        </select>
+        <select id="user-status-filter" onchange="filterUsers()">
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="trialing">Trial</option>
+          <option value="canceled">Cancelled</option>
+          <option value="past_due">Past due</option>
+        </select>
+      </div>
+      <div class="card"><div style="overflow-x:auto"><table>
+        <thead><tr><th>Name</th><th>Email</th><th>Agency</th><th>Plan</th><th>Status</th><th>Signed up</th><th>MRR</th><th></th></tr></thead>
+        <tbody id="users-tbody"></tbody>
+      </table></div></div>
+    </div>
+
+    <!-- REVENUE -->
+    <div id="pg-revenue" style="display:none">
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-label">This month</div><div class="stat-val" style="color:var(--green)" id="rev-month">$0</div><div class="stat-sub">collected</div></div>
+        <div class="stat"><div class="stat-label">Last month</div><div class="stat-val" id="rev-last">$0</div><div class="stat-sub">collected</div></div>
+        <div class="stat"><div class="stat-label">All time</div><div class="stat-val" id="rev-total">$0</div><div class="stat-sub">total revenue</div></div>
+        <div class="stat"><div class="stat-label">Avg revenue / user</div><div class="stat-val" id="rev-arpu">$0</div><div class="stat-sub">ARPU</div></div>
+        <div class="stat"><div class="stat-label">Stripe fees est.</div><div class="stat-val" style="color:var(--danger)" id="rev-fees">$0</div><div class="stat-sub">2.9% + $0.30</div></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Recent Transactions</div></div>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>User</th><th>Amount</th><th>Plan</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="transactions-tbody"><tr><td colspan="5" class="empty">Loading transactions...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div id="pg-activity" style="display:none">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">All Activity</div></div>
+        <div style="padding:0 16px" id="all-activity"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const ADMIN_EMAIL = 'YOUR_ADMIN_EMAIL@example.com'; // Your email — only you can access this page
+
+const PLAN_PRICES = { starter: 49, pro: 97, agency: 197 };
+
+let allUsers = [];
+let adminActivity = [];
+
+// ── AUTH CHECK ──
+async function checkAuth() {
+  const token = localStorage.getItem('norx-auth-token');
+  const email = localStorage.getItem('norx-user-email');
+  if (!token || email !== ADMIN_EMAIL) {
+    window.location.href = 'login.html';
+    return false;
+  }
+  return true;
+}
+
+// ── LOAD DATA ──
+async function loadData() {
+  if (!await checkAuth()) return;
+  const token = localStorage.getItem('norx-auth-token');
+
+  try {
+    // Load all users from Supabase profiles table
+    const usersResp = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=*&order=created_at.desc`, {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` }
+    });
+    allUsers = await usersResp.json();
+    if (!Array.isArray(allUsers)) allUsers = [];
+
+    // Load activity log
+    const actResp = await fetch(`${SUPABASE_URL}/rest/v1/activity_log?select=*&order=created_at.desc&limit=100`, {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` }
+    });
+    adminActivity = await actResp.json();
+    if (!Array.isArray(adminActivity)) adminActivity = [];
+
+    renderOverview();
+    renderUsers();
+    renderRevenue();
+    renderActivity();
+  } catch(e) {
+    console.error('Load error:', e);
+  }
+}
+
+function renderOverview() {
+  const active = allUsers.filter(u => u.subscription_status === 'active');
+  const trialing = allUsers.filter(u => u.subscription_status === 'trialing');
+  const cancelled = allUsers.filter(u => u.subscription_status === 'canceled');
+
+  const mrr = allUsers
+    .filter(u => u.subscription_status === 'active' || u.subscription_status === 'trialing')
+    .reduce((sum, u) => sum + (PLAN_PRICES[u.plan] || 0), 0);
+
+  document.getElementById('stat-mrr').textContent = '$' + mrr.toLocaleString();
+  document.getElementById('stat-users').textContent = allUsers.length;
+  document.getElementById('stat-users-sub').textContent = active.length + ' active';
+  document.getElementById('stat-trials').textContent = trialing.length;
+  document.getElementById('stat-churned').textContent = cancelled.length;
+  document.getElementById('stat-arr').textContent = '$' + (mrr * 12).toLocaleString();
+
+  // Plan breakdown
+  const plans = { starter: 0, pro: 0, agency: 0 };
+  allUsers.filter(u => u.subscription_status === 'active' || u.subscription_status === 'trialing')
+    .forEach(u => { if (plans[u.plan] !== undefined) plans[u.plan]++; });
+  const planColors = { starter: 'var(--text2)', pro: 'var(--accent)', agency: 'var(--purple)' };
+  document.getElementById('plan-breakdown').innerHTML = Object.keys(plans).map(p => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${planColors[p]}"></div>
+        <div style="font-size:13px;color:var(--text);text-transform:capitalize">${p}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace">${plans[p]} users</div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">$${(plans[p] * PLAN_PRICES[p]).toLocaleString()}/mo</div>
+      </div>
+    </div>`).join('');
+
+  // Recent signups
+  document.getElementById('recent-signups').innerHTML = allUsers.slice(0, 10).map(u => `
+    <tr>
+      <td class="primary">${u.first_name || ''} ${u.last_name || ''}</td>
+      <td><span class="badge b-${u.plan || 'starter'}">${u.plan || 'starter'}</span></td>
+      <td>${statusBadge(u.subscription_status)}</td>
+      <td class="mono" style="font-size:11px">${formatDate(u.created_at)}</td>
+      <td class="mono" style="color:var(--green)">$${PLAN_PRICES[u.plan] || 0}/mo</td>
+    </tr>`).join('') || '<tr><td colspan="5" class="empty">No users yet</td></tr>';
+
+  // Activity
+  document.getElementById('admin-activity').innerHTML = adminActivity.slice(0, 8).map(a => `
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${a.type === 'signup' ? 'var(--green)' : a.type === 'cancel' ? 'var(--danger)' : 'var(--accent)'}"></div>
+      <div class="activity-text">${a.description || ''}</div>
+      <div class="activity-time">${formatDate(a.created_at)}</div>
+    </div>`).join('') || '<div class="empty" style="padding:20px">No activity yet</div>';
+}
+
+function renderUsers() {
+  filterUsers();
+}
+
+function filterUsers() {
+  const q = (document.getElementById('user-search')?.value || '').toLowerCase();
+  const planF = document.getElementById('user-plan-filter')?.value || '';
+  const statusF = document.getElementById('user-status-filter')?.value || '';
+
+  let list = allUsers;
+  if (q) list = list.filter(u =>
+    (u.email || '').toLowerCase().includes(q) ||
+    ((u.first_name || '') + ' ' + (u.last_name || '')).toLowerCase().includes(q) ||
+    (u.agency_name || '').toLowerCase().includes(q)
+  );
+  if (planF) list = list.filter(u => u.plan === planF);
+  if (statusF) list = list.filter(u => u.subscription_status === statusF);
+
+  document.getElementById('users-tbody').innerHTML = list.map(u => `
+    <tr>
+      <td class="primary">${u.first_name || ''} ${u.last_name || ''}</td>
+      <td class="mono" style="font-size:11px">${u.email || ''}</td>
+      <td style="font-size:12px;color:var(--text2)">${u.agency_name || '—'}</td>
+      <td><span class="badge b-${u.plan || 'starter'}">${u.plan || 'starter'}</span></td>
+      <td>${statusBadge(u.subscription_status)}</td>
+      <td class="mono" style="font-size:11px">${formatDate(u.created_at)}</td>
+      <td class="mono" style="color:var(--green)">$${PLAN_PRICES[u.plan] || 0}</td>
+      <td>
+        <button class="btn btn-sm" onclick="viewUser('${u.id}')">View</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="8" class="empty">No users found</td></tr>';
+}
+
+function renderRevenue() {
+  const activeUsers = allUsers.filter(u => u.subscription_status === 'active' || u.subscription_status === 'trialing');
+  const mrr = activeUsers.reduce((s, u) => s + (PLAN_PRICES[u.plan] || 0), 0);
+  const arpu = activeUsers.length ? Math.round(mrr / activeUsers.length) : 0;
+  const fees = Math.round(mrr * 0.029 + (activeUsers.length * 0.30));
+
+  document.getElementById('rev-month').textContent = '$' + mrr.toLocaleString();
+  document.getElementById('rev-total').textContent = '$' + mrr.toLocaleString();
+  document.getElementById('rev-arpu').textContent = '$' + arpu;
+  document.getElementById('rev-fees').textContent = '~$' + fees;
+  document.getElementById('transactions-tbody').innerHTML = '<tr><td colspan="5" class="empty">Connect Stripe webhook to see individual transactions</td></tr>';
+}
+
+function renderActivity() {
+  document.getElementById('all-activity').innerHTML = adminActivity.map(a => `
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${a.type === 'signup' ? 'var(--green)' : a.type === 'cancel' ? 'var(--danger)' : 'var(--accent)'}"></div>
+      <div class="activity-text">${a.description || ''}</div>
+      <div class="activity-time">${formatDate(a.created_at)}</div>
+    </div>`).join('') || '<div class="empty" style="padding:28px">No activity yet</div>';
+}
+
+function viewUser(id) {
+  const u = allUsers.find(x => x.id === id);
+  if (!u) return;
+  alert(`User: ${u.first_name} ${u.last_name}\nEmail: ${u.email}\nPlan: ${u.plan}\nStatus: ${u.subscription_status}\nSigned up: ${formatDate(u.created_at)}\nAgency: ${u.agency_name || 'N/A'}`);
+}
+
+function statusBadge(status) {
+  const m = { active: 'b-active', trialing: 'b-trial', canceled: 'b-cancelled', past_due: 'b-past-due' };
+  const labels = { active: 'Active', trialing: 'Trial', canceled: 'Cancelled', past_due: 'Past Due' };
+  const cls = m[status] || 'b-cancelled';
+  return `<span class="badge ${cls}">${labels[status] || status || 'Unknown'}</span>`;
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function showPage(el) {
+  document.querySelectorAll('[id^="pg-"]').forEach(p => p.style.display = 'none');
+  document.getElementById('pg-' + el.dataset.page).style.display = 'block';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  const titles = { overview: 'Overview', users: 'Users', revenue: 'Revenue', activity: 'Activity' };
+  document.getElementById('page-title').textContent = titles[el.dataset.page] || el.dataset.page;
+}
+
+function logout() {
+  localStorage.removeItem('norx-auth-token');
+  localStorage.removeItem('norx-user-email');
+  window.location.href = 'login.html';
+}
+
+// Init
+checkAuth().then(ok => { if (ok) loadData(); });
+setInterval(loadData, 60000); // Auto-refresh every minute
+</script>
+</body>
+</html>
