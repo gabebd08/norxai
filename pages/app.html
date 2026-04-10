@@ -688,7 +688,7 @@ let pollTimer=null,lastPollTs=0;
 // ═══════════════════════════════════════════════
 function init(){
   loadData();
-  if(!contacts.length) seedContacts();
+  // No seed contacts for SaaS version — new users start fresh
   if(!templates.length) seedTemplates();
   loadSettings();
   renderAll();
@@ -698,26 +698,8 @@ function init(){
 }
 
 function seedContacts(){
-  contacts=[
-    {id:1,name:'All About Roofing Repair & Installation',industry:'Roofing',phone:'',email:'info@aaroof.net',website:'https://aaroof.net',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:2,name:'South County Roofing',industry:'Roofing',phone:'',email:'customerservice@southcountyroofing.com',website:'https://southcountyroofing.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:3,name:'Canyon Roofing Contractors',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:4,name:'Everereen Roofing Contractor Services Irvine',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:5,name:'Laguna Hills Roofing',industry:'Roofing',phone:'',email:'',website:'https://lagunahills-roofing.company',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:6,name:'Merit Roofing & Waterproofing',industry:'Roofing',phone:'',email:'info@precisionroofingoc.com',website:'https://precisionroofingoc.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:7,name:'OC Custom Roofing',industry:'Roofing',phone:'',email:'',website:'https://occommercialroofing.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:8,name:'Pro Roofing Company Irvine',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:9,name:'Central Roofing Company Irvine',industry:'Roofing',phone:'',email:'',website:'https://centralroof.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:10,name:'Pacific Roofing Systems',industry:'Roofing',phone:'',email:'',website:'https://pacificroofingsystems.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:11,name:'McCormack Roofing',industry:'Roofing',phone:'',email:'info@mccormackroofing.com',website:'https://mccormackroofing.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:12,name:'RESCUE ROOFER Mission Viejo',industry:'Roofing',phone:'',email:'',website:'https://rescueroofer.net',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:13,name:'Infinity Roofing Irvine CA',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:14,name:'Empire West Roofing',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-    {id:15,name:'South County Roofing (Lake Forest)',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
-  ];
-  saveData();
+  // Disabled for SaaS — users start with zero contacts
 }
-
 function seedTemplates(){
   templates=[
     {id:1,name:'Cold Opener',body:'hey is this [Business Name]?'},
