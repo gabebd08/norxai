@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirming your account — Norx AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080a0e;--accent:#00d4ff;--text:#eef0f4;--text2:#7c8494;--green:#00e5a0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+.wrap{max-width:400px}
+.icon{width:56px;height:56px;border-radius:50%;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+h1{font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px}
+p{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.spinner{width:28px;height:28px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+a{color:var(--accent);text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="loading-state">
+    <div class="spinner"></div>
+    <h1>Confirming your account...</h1>
+    <p>Hold tight, we're verifying your email.</p>
+  </div>
+  <div id="success-state" style="display:none">
+    <div class="icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-9" stroke="#00e5a0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h1>Email confirmed!</h1>
+    <p>Your account is ready. Redirecting you to the app...</p>
+  </div>
+  <div id="error-state" style="display:none">
+    <h1>Confirmation failed</h1>
+    <p id="error-msg">This link may have expired. <a href="/login">Go to login →</a></p>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://eyofcybilytepouerssp.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5b2ZjeWJpbHl0ZXBvdWVyc3NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3ODk3MDMsImV4cCI6MjA5MTM2NTcwM30.6Kj2I5guyQFaBW3EryWMeWGzbmitMfBCRdTMXzBR3ZE';
+
+async function handleConfirmation() {
+  const hash = window.location.hash;
+  const params = new URLSearchParams(hash.replace('#', '?'));
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+  const type = params.get('type');
+
+  if (!accessToken) {
+    // Try query string too
+    const qp = new URLSearchParams(window.location.search);
+    const token_hash = qp.get('token_hash');
+    if (token_hash) {
+      // OTP verification
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+          body: JSON.stringify({ token_hash, type: 'email' }),
+        });
+        const data = await resp.json();
+        if (data.access_token) {
+          storeAndRedirect(data);
+          return;
+        }
+      } catch(e) {}
+    }
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('error-state').style.display = 'block';
+    return;
+  }
+
+  // Store tokens and redirect
+  storeAndRedirect({ access_token: accessToken, refresh_token: refreshToken, user: { id: params.get('id') } });
+}
+
+function storeAndRedirect(data) {
+  localStorage.setItem('norx-auth-token', data.access_token);
+  if (data.refresh_token) localStorage.setItem('norx-refresh-token', data.refresh_token);
+  if (data.user?.id) localStorage.setItem('norx-user-id', data.user.id);
+  if (data.user?.email) localStorage.setItem('norx-user-email', data.user.email);
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('success-state').style.display = 'block';
+  setTimeout(() => window.location.href = '/app', 1500);
+}
+
+handleConfirmation();
+</script>
+</body>
+</html>

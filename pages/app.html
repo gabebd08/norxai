@@ -298,14 +298,19 @@ select option{background:var(--bg3);color:var(--text)}
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
       Settings
     </div>
+    <div class="nav-item" onclick="window.location.href='/account'">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" fill="currentColor"/><path d="M1 14c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      My Account
+    </div>
   </div>
   <div class="sidebar-bottom">
-    <div class="user-card">
+    <div class="user-card" style="cursor:pointer" onclick="window.location.href='/account'">
       <div class="avatar" id="sidebar-avatar">G</div>
-      <div>
-        <div style="font-size:13px;font-weight:600" id="sidebar-name">Gabe</div>
-        <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace">Agency Owner</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="sidebar-name">Loading...</div>
+        <div style="font-size:10px;color:var(--accent);font-family:'JetBrains Mono',monospace" id="sidebar-plan">starter</div>
       </div>
+      <button onclick="event.stopPropagation();logoutUser()" title="Log out" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;font-size:16px;line-height:1">⏻</button>
     </div>
   </div>
 </div>
@@ -566,6 +571,96 @@ select option{background:var(--bg3);color:var(--text)}
 <div class="toast-container" id="toast-container"></div>
 
 <!-- ═══ MODALS ═══ -->
+<!-- ONBOARDING MODAL -->
+<div class="modal-bg" id="m-onboarding" style="z-index:600">
+  <div class="modal" style="max-width:540px;padding:0;overflow:hidden">
+    <div style="background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(167,139,250,0.1));padding:32px 32px 24px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#080a0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div style="font-size:20px;font-weight:800;letter-spacing:-0.5px">Welcome to Norx AI</div>
+          <div style="font-size:13px;color:var(--text2)">Let's get you set up in 3 quick steps</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:24px 32px">
+      <!-- Steps -->
+      <div id="onboard-steps">
+        <!-- Step 1 -->
+        <div id="ob-step-1">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Step 1 of 3</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px">Connect Twilio for SMS</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px">
+            Twilio is what sends your text messages. Sign up free at <a href="https://twilio.com" target="_blank" style="color:var(--accent)">twilio.com</a>, get your credentials, then paste them below.
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;margin-bottom:18px">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:600">Quick setup:</div>
+            <div style="font-size:12px;color:var(--text3);line-height:2;font-family:'JetBrains Mono',monospace">
+              1. Go to twilio.com → sign up free<br>
+              2. Copy your Account SID + Auth Token<br>
+              3. Buy a phone number (~$1/mo)<br>
+              4. Paste credentials in Settings below
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="obStep1Done()">I have my Twilio credentials →</button>
+            <button class="btn" onclick="obSkip(1)">Set up later</button>
+          </div>
+        </div>
+        <!-- Step 2 -->
+        <div id="ob-step-2" style="display:none">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Step 2 of 3</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px">Add Google Places API Key</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px">
+            This powers the Lead Finder — pulls real business phone numbers from Google Maps. Free to set up.
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;margin-bottom:18px">
+            <div style="font-size:12px;color:var(--text3);line-height:2;font-family:'JetBrains Mono',monospace">
+              1. Go to console.cloud.google.com<br>
+              2. New project → APIs & Services → Library<br>
+              3. Enable: Places API (New) + Geocoding API<br>
+              4. Credentials → Create API Key → copy it
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="obStep2Done()">I have my API key →</button>
+            <button class="btn" onclick="obSkip(2)">Set up later</button>
+          </div>
+        </div>
+        <!-- Step 3 -->
+        <div id="ob-step-3" style="display:none">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Step 3 of 3</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px">You're ready to launch 🚀</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">
+            Here's your quick start workflow:
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px">
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0">1</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Find leads</div><div style="font-size:12px;color:var(--text3)">Lead Finder → search your niche + city → select leads</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0">2</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Create templates</div><div style="font-size:12px;color:var(--text3)">Templates → edit the starter templates to match your offer</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0">3</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Send your first blast</div><div style="font-size:12px;color:var(--text3)">Lead Finder → select leads → ⚡ Add + Launch SMS Blast</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(0,229,160,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0">4</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Track replies</div><div style="font-size:12px;color:var(--text3)">Inbox → reply to leads → move them through your Pipeline</div></div>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;padding:13px;font-size:14px" onclick="finishOnboarding()">Let's go →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="m-add-contact"><div class="modal">
   <div class="modal-title">Add Contact</div>
   <div class="grid-2">
@@ -675,6 +770,69 @@ select option{background:var(--bg3);color:var(--text)}
 
 <script>
 // ═══════════════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════════════
+const SB_URL='https://eyofcybilytepouerssp.supabase.co';
+const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5b2ZjeWJpbHl0ZXBvdWVyc3NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3ODk3MDMsImV4cCI6MjA5MTM2NTcwM30.6Kj2I5guyQFaBW3EryWMeWGzbmitMfBCRdTMXzBR3ZE';
+
+const PLAN_LIMITS={
+  starter:{contacts:500,sms:1000,searches:5,campaigns:3},
+  pro:{contacts:2500,sms:5000,searches:20,campaigns:10},
+  agency:{contacts:Infinity,sms:Infinity,searches:Infinity,campaigns:Infinity},
+};
+
+let currentUser=null; // {id, email, token, plan, isBeta}
+
+async function sbFetch(path,opts={}){
+  const headers={'apikey':SB_ANON,'Content-Type':'application/json',...(currentUser?{'Authorization':'Bearer '+currentUser.token}:{}),  ...(opts.headers||{})};
+  const r=await fetch(SB_URL+'/rest/v1/'+path,{...opts,headers});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'DB '+r.status);}
+  const t=await r.text();return t?JSON.parse(t):null;
+}
+
+async function getProfile(){
+  if(!currentUser) return null;
+  try{const rows=await sbFetch('profiles?id=eq.'+currentUser.id+'&select=*');return rows?.[0]||null;}
+  catch(e){return null;}
+}
+
+async function checkPlanLimit(type){
+  if(!currentUser) return {ok:true};
+  const profile=await getProfile();
+  if(!profile||profile.is_beta) return {ok:true};
+  const plan=profile.plan||'starter';
+  const limits=PLAN_LIMITS[plan];
+  const month=new Date().toISOString().slice(0,7);
+  try{
+    const rows=await sbFetch('usage?user_id=eq.'+currentUser.id+'&month=eq.'+month+'&select=*');
+    const u=rows?.[0]||{};
+    const map={contact:['contacts_count',limits.contacts,'contacts'],sms:['sms_sent',limits.sms,'SMS'],search:['finder_searches',limits.searches,'Lead Finder searches'],campaign:['campaigns_count',limits.campaigns,'campaigns']};
+    const [field,limit,label]=map[type]||[];
+    if(field&&limit!==Infinity&&(u[field]||0)>=limit){
+      return{ok:false,msg:`${label} limit reached (${limit} on ${plan} plan). <a href="/account" style="color:inherit;text-decoration:underline">Upgrade your plan →</a>`};
+    }
+  }catch(e){return{ok:true};}
+  return{ok:true};
+}
+
+async function incrementUsage(type,amount=1){
+  if(!currentUser) return;
+  const month=new Date().toISOString().slice(0,7);
+  const field={contact:'contacts_count',sms:'sms_sent',search:'finder_searches',campaign:'campaigns_count'}[type];
+  if(!field) return;
+  try{
+    // Try to get existing row first
+    const rows=await sbFetch('usage?user_id=eq.'+currentUser.id+'&month=eq.'+month+'&select=*');
+    if(rows&&rows.length>0){
+      const cur=rows[0][field]||0;
+      await sbFetch('usage?id=eq.'+rows[0].id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({[field]:cur+amount})});
+    }else{
+      await sbFetch('usage',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({user_id:currentUser.id,month,[field]:amount})});
+    }
+  }catch(e){console.warn('incrementUsage:',e);}
+}
+
+// ═══════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════
 let contacts=[],templates=[],campaigns=[],conversations={},stats={sent:0,replies:0,optouts:0};
@@ -686,15 +844,149 @@ let pollTimer=null,lastPollTs=0;
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
-function init(){
-  loadData();
-  // No seed contacts for SaaS version — new users start fresh
+function showOnboarding(){
+  document.getElementById('m-onboarding').classList.add('open');
+}
+function obStep1Done(){
+  document.getElementById('ob-step-1').style.display='none';
+  document.getElementById('ob-step-2').style.display='block';
+  // Open settings so they can paste Twilio creds
+  closeM('onboarding');
+  nav(document.querySelector('[data-page=settings]'));
+  toast('Paste your Twilio credentials below and hit Save','info');
+  setTimeout(()=>document.getElementById('m-onboarding').classList.add('open'),100);
+  // After settings save, auto advance
+}
+function obSkip(step){
+  if(step===1){document.getElementById('ob-step-1').style.display='none';document.getElementById('ob-step-2').style.display='block';}
+  else if(step===2){document.getElementById('ob-step-2').style.display='none';document.getElementById('ob-step-3').style.display='block';}
+}
+function obStep2Done(){
+  document.getElementById('ob-step-2').style.display='none';
+  document.getElementById('ob-step-3').style.display='block';
+}
+function finishOnboarding(){
+  localStorage.setItem('norx-onboarded','1');
+  closeM('onboarding');
+  nav(document.querySelector('[data-page=finder]'));
+  toast('Welcome to Norx AI! Start by searching for leads.','success');
+}
+
+async function init(){
+  // ── Auth check — redirect to login if not signed in ──
+  const token=localStorage.getItem('norx-auth-token');
+  const userId=localStorage.getItem('norx-user-id');
+  const email=localStorage.getItem('norx-user-email');
+  if(!token||!userId){
+    window.location.href='/login';
+    return;
+  }
+  currentUser={id:userId,email,token,plan:localStorage.getItem('norx-user-plan')||'starter'};
+
+  // ── Load from Supabase first, fallback to localStorage ──
+  showAppLoader('Loading your workspace...');
+  await loadDataFromSupabase();
   if(!templates.length) seedTemplates();
   loadSettings();
+  hideAppLoader();
   renderAll();
   updateStatuses();
   checkHosting();
   startPolling();
+  showUserInfo();
+
+  // ── Show onboarding if first time ──
+  const onboarded=localStorage.getItem('norx-onboarded');
+  if(!onboarded) showOnboarding();
+}
+
+function showAppLoader(msg){
+  let el=document.getElementById('app-loader');
+  if(!el){
+    el=document.createElement('div');
+    el.id='app-loader';
+    el.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px';
+    el.innerHTML='<div style="width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite"></div><div style="font-size:13px;color:var(--text3);font-family:JetBrains Mono,monospace" id="app-loader-msg">'+msg+'</div>';
+    document.body.appendChild(el);
+  }else{
+    const m=document.getElementById('app-loader-msg');
+    if(m) m.textContent=msg;
+  }
+}
+function hideAppLoader(){
+  const el=document.getElementById('app-loader');
+  if(el) el.remove();
+}
+
+function showUserInfo(){
+  if(!currentUser) return;
+  const meta=JSON.parse(localStorage.getItem('norx-user-meta')||'{}');
+  const name=meta.first_name||currentUser.email?.split('@')[0]||'User';
+  const el=document.getElementById('sidebar-name');
+  if(el) el.textContent=name;
+  const av=document.getElementById('sidebar-avatar');
+  if(av) av.textContent=name[0].toUpperCase();
+  const planEl=document.getElementById('sidebar-plan');
+  if(planEl) planEl.textContent=currentUser.plan||'starter';
+  // Load plan from Supabase profile async
+  getProfile().then(p=>{
+    if(p){
+      currentUser.plan=p.plan||'starter';
+      currentUser.isBeta=p.is_beta||false;
+      if(planEl) planEl.textContent=(p.is_beta?'beta — ':'')+(p.plan||'starter');
+    }
+  });
+}
+
+async function loadDataFromSupabase(){
+  if(!currentUser) return loadData();
+  try{
+    // Load contacts
+    const dbContacts=await sbFetch('contacts?user_id=eq.'+currentUser.id+'&order=created_at.desc&select=*');
+    if(dbContacts&&dbContacts.length>0){
+      contacts=dbContacts.map(r=>({
+        id:r.id,dbId:r.id,
+        name:r.name,industry:r.industry||'',
+        phone:r.phone||'',email:r.email||'',
+        website:r.website||'',status:r.status||'Saved',
+        notes:r.notes||'',callbackNote:r.callback_note||'',
+        smsSent:r.sms_sent||0,lastContact:r.last_contact||'—',
+      }));
+    }else{
+      contacts=JSON.parse(localStorage.getItem('norx-contacts')||'[]');
+    }
+
+    // Load campaigns
+    const dbCamps=await sbFetch('campaigns?user_id=eq.'+currentUser.id+'&order=created_at.desc&select=*');
+    if(dbCamps&&dbCamps.length>0){
+      campaigns=dbCamps.map(r=>({
+        id:r.id,dbId:r.id,name:r.name,target:r.target,
+        template:r.template_name,total:r.total,sent:r.sent,
+        failed:r.failed,cancelled:r.cancelled||0,
+        status:r.status,date:r.campaign_date,
+      }));
+    }else{
+      campaigns=JSON.parse(localStorage.getItem('norx-campaigns')||'[]');
+    }
+
+    // Load templates
+    const dbTpls=await sbFetch('templates?user_id=eq.'+currentUser.id+'&order=created_at.asc&select=*');
+    if(dbTpls&&dbTpls.length>0){
+      templates=dbTpls.map(r=>({id:r.id,dbId:r.id,name:r.name,body:r.body}));
+    }else{
+      templates=JSON.parse(localStorage.getItem('norx-templates')||'[]');
+    }
+
+    // Load stats + convos from localStorage (fast local cache)
+    stats=JSON.parse(localStorage.getItem('norx-stats')||'{"sent":0,"replies":0,"optouts":0}');
+    conversations=JSON.parse(localStorage.getItem('norx-convos')||'{}'  );
+    activityLog=JSON.parse(localStorage.getItem('norx-activity')||'[]');
+    inboxUnread=JSON.parse(localStorage.getItem('norx-unread')||'{}'  );
+
+  }catch(e){
+    console.error('Supabase load failed, using localStorage:',e);
+    loadData();
+  }
 }
 
 function seedContacts(){
@@ -702,12 +994,21 @@ function seedContacts(){
 }
 function seedTemplates(){
   templates=[
-    {id:1,name:'Cold Opener',body:'hey is this [Business Name]?'},
-    {id:2,name:'Follow-Up Pitch',body:"Hey my name's [Your Name], I'm from the local area and I help [Industry] businesses like yours run Meta & Google ads to bring in more qualified leads.\n\nIf this sounds good, my schedule is open this week — want to hop on a quick 10-min call?\n\nReply STOP to opt out."},
-    {id:3,name:'Second Follow-Up',body:"Hey just circling back — did you get my last message? Would love to connect if the timing's right.\n\nReply STOP to opt out."},
-    {id:4,name:'Warm Lead Close',body:"Hey [Business Name]! Ready to get more qualified leads coming in? I have a slot this week.\n\nReply STOP to opt out."},
-    {id:5,name:'Send Booking Link',body:"Awesome! Here's my calendar link to grab a time: [Calendly]\n\nLooking forward to it!"},
-    {id:6,name:'Closed Won',body:"Great connecting with you [Business Name]! I'll be in touch shortly with next steps. Excited to work together!"},
+    {
+      id:1,
+      name:'Opener — edit me',
+      body:'hey is this [Business Name]?\n\n— [Your Name]'
+    },
+    {
+      id:2,
+      name:'Follow-Up — edit me',
+      body:"Hey [Business Name], just following up on my last message.\n\nI work with [Industry] businesses and think there could be a good fit — would you be open to a quick 10-min call this week?\n\nReply STOP to opt out."
+    },
+    {
+      id:3,
+      name:'Booking Link — edit me',
+      body:"Here\'s a link to grab a time: [Calendly]\n\nLooking forward to it!"
+    },
   ];
   saveData();
 }
@@ -716,6 +1017,7 @@ function seedTemplates(){
 // STORAGE
 // ═══════════════════════════════════════════════
 function saveData(){
+  // Always save to localStorage for fast access
   try{
     localStorage.setItem('norx-contacts',JSON.stringify(contacts));
     localStorage.setItem('norx-templates',JSON.stringify(templates));
@@ -725,6 +1027,90 @@ function saveData(){
     localStorage.setItem('norx-activity',JSON.stringify(activityLog.slice(-100)));
     localStorage.setItem('norx-unread',JSON.stringify(inboxUnread));
   }catch(e){}
+}
+
+// Sync a single contact to Supabase
+async function syncContact(contact){
+  if(!currentUser) return contact;
+  try{
+    const row={
+      user_id:currentUser.id,
+      name:contact.name,industry:contact.industry||'',
+      phone:contact.phone||'',email:contact.email||'',
+      website:contact.website||'',status:contact.status||'Saved',
+      notes:contact.notes||'',callback_note:contact.callbackNote||'',
+      sms_sent:contact.smsSent||0,last_contact:contact.lastContact||null,
+    };
+    if(contact.dbId){
+      await sbFetch('contacts?id=eq.'+contact.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    }else{
+      const res=await sbFetch('contacts',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
+      if(res?.[0]?.id) contact.dbId=res[0].id;
+    }
+  }catch(e){console.warn('syncContact:',e);}
+  return contact;
+}
+
+// Sync multiple contacts (bulk) to Supabase
+async function syncAllContacts(){
+  if(!currentUser||!contacts.length) return;
+  const toInsert=contacts.filter(c=>!c.dbId);
+  const toUpdate=contacts.filter(c=>c.dbId);
+  try{
+    if(toInsert.length){
+      const rows=toInsert.map(c=>({
+        user_id:currentUser.id,name:c.name,industry:c.industry||'',
+        phone:c.phone||'',email:c.email||'',website:c.website||'',
+        status:c.status||'Saved',notes:c.notes||'',
+        callback_note:c.callbackNote||'',sms_sent:c.smsSent||0,
+      }));
+      for(let i=0;i<rows.length;i+=50){
+        const res=await sbFetch('contacts',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(rows.slice(i,i+50))});
+        if(res){res.forEach((r,idx)=>{if(contacts[i+idx]) contacts[i+idx].dbId=r.id;});}
+      }
+    }
+    for(const c of toUpdate){
+      await sbFetch('contacts?id=eq.'+c.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({
+        status:c.status,notes:c.notes||'',callback_note:c.callbackNote||'',
+        sms_sent:c.smsSent||0,last_contact:c.lastContact||null,phone:c.phone||'',
+      })});
+    }
+  }catch(e){console.warn('syncAllContacts:',e);}
+}
+
+// Sync a single template
+async function syncTemplate(tpl){
+  if(!currentUser) return tpl;
+  try{
+    const row={user_id:currentUser.id,name:tpl.name,body:tpl.body};
+    if(tpl.dbId){
+      await sbFetch('templates?id=eq.'+tpl.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    }else{
+      const res=await sbFetch('templates',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
+      if(res?.[0]?.id) tpl.dbId=res[0].id;
+    }
+  }catch(e){console.warn('syncTemplate:',e);}
+  return tpl;
+}
+
+// Sync campaign to Supabase
+async function syncCampaign(camp){
+  if(!currentUser) return camp;
+  try{
+    const row={
+      user_id:currentUser.id,name:camp.name,target:camp.target,
+      template_name:camp.template,total:camp.total,sent:camp.sent,
+      failed:camp.failed,cancelled:camp.cancelled||0,
+      status:camp.status,campaign_date:camp.date,
+    };
+    if(camp.dbId){
+      await sbFetch('campaigns?id=eq.'+camp.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    }else{
+      const res=await sbFetch('campaigns',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
+      if(res?.[0]?.id) camp.dbId=res[0].id;
+    }
+  }catch(e){console.warn('syncCampaign:',e);}
+  return camp;
 }
 function loadData(){
   try{
@@ -1025,9 +1411,16 @@ async function runCampaign(name,target,tpl,industry=''){
     return;
   }
 
+  // Check plan limit before launching
+  const campCheck=await checkPlanLimit('campaign');
+  if(!campCheck.ok){toast(campCheck.msg,'error');return;}
+
   campaignCancelled=false;
   const camp={id:Date.now(),name,target,template:tpl.name,total:recipients.length,sent:0,failed:0,cancelled:0,date:new Date().toLocaleDateString(),status:'sending'};
-  campaigns.unshift(camp);saveData();
+  campaigns.unshift(camp);
+  syncCampaign(camp);
+  incrementUsage('campaign');
+  saveData();
   openM('sending');
   const pFill=document.getElementById('send-progress'),pDetail=document.getElementById('send-detail'),pTitle=document.getElementById('send-title'),pSub=document.getElementById('send-sub');
   const cancelBtn=document.getElementById('cancel-camp-btn');
@@ -1067,6 +1460,8 @@ async function runCampaign(name,target,tpl,industry=''){
       conversations[c.id].push({dir:'out',text:msg,time:new Date().toLocaleTimeString(),ts:Date.now(),sid:result.sid||''});
       pDetail.textContent=`${i+1} / ${recipients.length} ✓ ${c.name}`;
       logActivity(`SMS sent to ${c.name}`,'accent');
+      syncContact(c); // update status in Supabase
+      incrementUsage('sms');
     }catch(e){
       camp.failed++;
       pDetail.textContent=`${i+1} / ${recipients.length} ✗ ${c.name}: ${e.message.substring(0,50)}`;
@@ -1583,8 +1978,11 @@ function checkPipelineHealth(){
 function addContact(){
   const name=document.getElementById('n-biz').value.trim();
   if(!name){toast('Business name required.','error');return;}
-  contacts.unshift({id:Date.now(),name,industry:document.getElementById('n-ind').value.trim()||'Unknown',phone:document.getElementById('n-phone').value.trim(),email:document.getElementById('n-email').value.trim(),website:document.getElementById('n-web').value.trim(),status:document.getElementById('n-status').value,notes:document.getElementById('n-notes').value.trim(),lastContact:'—',smsSent:0});
-  saveData();closeM('add-contact');
+  const newC={id:Date.now(),name,industry:document.getElementById('n-ind').value.trim()||'Unknown',phone:document.getElementById('n-phone').value.trim(),email:document.getElementById('n-email').value.trim(),website:document.getElementById('n-web').value.trim(),status:document.getElementById('n-status').value,notes:document.getElementById('n-notes').value.trim(),lastContact:'—',smsSent:0};
+  contacts.unshift(newC);
+  syncContact(newC).then(()=>saveData());
+  incrementUsage('contact');
+  closeM('add-contact');
   ['n-biz','n-ind','n-phone','n-email','n-web','n-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   renderAll();toast('Contact added!','success');
 }
@@ -1596,7 +1994,9 @@ function importContacts(){
     if(p[0]){contacts.push({id:Date.now()+Math.random(),name:p[0],industry:p[1]||'Unknown',phone:p[2]||'',email:p[3]||'',website:p[4]||'',status:'Saved',notes:'',lastContact:'—',smsSent:0});count++;}
   });
   saveData();closeM('import');document.getElementById('import-txt').value='';renderAll();
-  toast(`Imported ${count} contacts.`,'success');
+  toast(`Imported ${count} contacts. Syncing to database...`,'success');
+  syncAllContacts().then(()=>{saveData();toast(`${count} contacts synced!`,'success');});
+  incrementUsage('contact',count);
 }
 function setStatus(id,val){
   const c=contacts.find(x=>x.id===id||x.id==id);if(!c) return;
@@ -1671,8 +2071,15 @@ function saveNotes(id){const c=contacts.find(x=>x.id===id);if(c){c.notes=documen
 function saveTemplate(){
   const name=document.getElementById('t-name').value.trim(),body=document.getElementById('t-body').value.trim();
   if(!name||!body){toast('Name and message required.','error');return;}
-  if(editTplId){const t=templates.find(x=>x.id===editTplId);if(t){t.name=name;t.body=body;}editTplId=null;}
-  else templates.push({id:Date.now(),name,body});
+  if(editTplId){
+    const t=templates.find(x=>x.id===editTplId);
+    if(t){t.name=name;t.body=body;syncTemplate(t);}
+    editTplId=null;
+  }else{
+    const newT={id:Date.now(),name,body};
+    templates.push(newT);
+    syncTemplate(newT);
+  }
   saveData();closeM('new-template');
   document.getElementById('t-name').value='';document.getElementById('t-body').value='';
   document.getElementById('tpl-modal-title').textContent='New Template';
@@ -1741,6 +2148,10 @@ async function searchLeads(){
   const gkey=getGKey();
   if(!niche||!loc){toast('Enter a niche and location.','error');return;}
   if(!gkey){document.getElementById('finder-api-warn').style.display='block';toast('Add your Google Places API key in Settings.','error');return;}
+  // Check search limit
+  const searchCheck=await checkPlanLimit('search');
+  if(!searchCheck.ok){toast(searchCheck.msg,'error');return;}
+  incrementUsage('search');
   document.getElementById('finder-api-warn').style.display='none';
   document.getElementById('finder-results').style.display='block';
   document.getElementById('leads-body').innerHTML=`<div class="finder-loading"><div class="spinner"></div><div>Finding <strong style="color:var(--text)">${niche}</strong> near <strong style="color:var(--text)">${loc}</strong></div><div class="finder-progress" id="finder-prog">Geocoding location...</div></div>`;
@@ -1812,7 +2223,10 @@ function toggleLeads(cb){document.querySelectorAll('.lead-chk').forEach(c=>c.che
 function getSelectedLeads(){return[...document.querySelectorAll('.lead-chk:checked')].map(el=>finderResults[+el.dataset.i]).filter(Boolean);}
 function addLeadToContacts(r){
   if(contacts.find(c=>c.name===r.name)) return false;
-  contacts.unshift({id:Date.now()+Math.random(),name:r.name,industry:r.industry,phone:r.phone,email:'',website:r.website,status:'Saved',notes:`Rating: ${r.rating} · ${r.reviews} reviews · ${r.address}`,lastContact:'—',smsSent:0});
+  const newLead={id:Date.now()+Math.random(),name:r.name,industry:r.industry,phone:r.phone,email:'',website:r.website,status:'Saved',notes:`Rating: ${r.rating} · ${r.reviews} reviews · ${r.address}`,lastContact:'—',smsSent:0};
+  contacts.unshift(newLead);
+  syncContact(newLead);
+  incrementUsage('contact');
   return true;
 }
 function addSingleLead(i){const r=finderResults[i];if(!r) return;if(addLeadToContacts(r)){saveData();renderAll();toast(`${r.name} added.`,'success');}else toast(`${r.name} already exists.`,'info');}
@@ -1882,6 +2296,16 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 // ═══════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════
+function logoutUser(){
+  if(!confirm('Log out of Norx AI?')) return;
+  localStorage.removeItem('norx-auth-token');
+  localStorage.removeItem('norx-user-id');
+  localStorage.removeItem('norx-user-email');
+  localStorage.removeItem('norx-user-plan');
+  localStorage.removeItem('norx-user-meta');
+  window.location.href='/login';
+}
+
 function toast(msg,type='info'){
   const el=document.createElement('div');
   el.className=`toast toast-${type}`;

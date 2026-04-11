@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account — Norx AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080a0e;--bg2:#0d1017;--bg3:#131720;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#eef0f4;--text2:#7c8494;--text3:#3d4556;--accent:#00d4ff;--accent-dim:rgba(0,212,255,0.08);--accent-border:rgba(0,212,255,0.2);--green:#00e5a0;--green-dim:rgba(0,229,160,0.08);--warn:#ffb347;--danger:#ff5f5f;--danger-dim:rgba(255,95,95,0.08);--purple:#a78bfa;--r:8px;--r-lg:12px;--r-xl:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+nav{padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--bg2)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.nav-logo-text{font-size:16px;font-weight:700;color:var(--text)}
+.nav-logo-text span{color:var(--accent)}
+.nav-right{display:flex;gap:10px;align-items:center}
+.btn{padding:7px 14px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:'Syne',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{color:var(--text);background:var(--bg3)}
+.btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
+.btn-primary:hover{background:#00b8db;color:var(--bg)}
+.btn-danger{background:var(--danger-dim);color:var(--danger);border-color:rgba(255,95,95,0.25)}
+.main{max-width:680px;margin:0 auto;padding:40px 24px}
+.page-title{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--text2);margin-bottom:32px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);margin-bottom:16px}
+.plan-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:var(--r-lg);font-size:14px;font-weight:700;margin-bottom:16px}
+.plan-starter{background:rgba(255,255,255,0.05);color:var(--text2);border:1px solid var(--border2)}
+.plan-pro{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-border)}
+.plan-agency{background:rgba(167,139,250,0.1);color:var(--purple);border:1px solid rgba(167,139,250,0.25)}
+.usage-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.usage-row:last-child{border-bottom:none}
+.usage-label{font-size:13px;color:var(--text2)}
+.usage-val{font-size:13px;font-weight:600;color:var(--text);font-family:'JetBrains Mono',monospace}
+.usage-bar-wrap{flex:1;margin:0 14px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.usage-bar{height:100%;border-radius:2px;background:var(--accent);transition:width 0.5s ease}
+.usage-bar.warn{background:var(--warn)}
+.usage-bar.danger{background:var(--danger)}
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--text2)}
+.info-val{color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px}
+.alert{padding:10px 14px;border-radius:var(--r);font-size:13px;margin-bottom:14px;line-height:1.6}
+.alert-info{background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent)}
+.alert-warn{background:rgba(255,179,71,0.08);border:1px solid rgba(255,179,71,0.25);color:var(--warn)}
+.loading{color:var(--text3);font-size:13px;font-family:'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/app" class="nav-logo">
+    <div class="nav-logo-mark"><svg viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#080a0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="nav-logo-text">Norx<span> AI</span></div>
+  </a>
+  <div class="nav-right">
+    <a href="/app" class="btn">← Back to app</a>
+    <button class="btn" onclick="logout()">Log out</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-title">Your Account</div>
+  <div class="page-sub">Manage your plan, usage and billing</div>
+
+  <div id="loading" class="loading">Loading your account...</div>
+  <div id="account-content" style="display:none">
+
+    <!-- PLAN -->
+    <div class="card">
+      <div class="card-title">Current Plan</div>
+      <div class="plan-badge" id="plan-badge">Loading...</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px" id="plan-desc"></div>
+      <div class="info-row"><div class="info-label">Status</div><div class="info-val" id="sub-status">—</div></div>
+      <div class="info-row"><div class="info-label">Trial ends</div><div class="info-val" id="trial-ends">—</div></div>
+      <div class="info-row"><div class="info-label">Email</div><div class="info-val" id="account-email">—</div></div>
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+        <a href="/signup" class="btn btn-primary">Upgrade Plan</a>
+        <button class="btn btn-danger" onclick="confirmCancel()">Cancel Subscription</button>
+      </div>
+    </div>
+
+    <!-- USAGE -->
+    <div class="card">
+      <div class="card-title">This Month's Usage</div>
+      <div class="usage-row">
+        <div class="usage-label">Contacts</div>
+        <div class="usage-bar-wrap"><div class="usage-bar" id="bar-contacts" style="width:0%"></div></div>
+        <div class="usage-val" id="val-contacts">0 / 0</div>
+      </div>
+      <div class="usage-row">
+        <div class="usage-label">SMS Sent</div>
+        <div class="usage-bar-wrap"><div class="usage-bar" id="bar-sms" style="width:0%"></div></div>
+        <div class="usage-val" id="val-sms">0 / 0</div>
+      </div>
+      <div class="usage-row">
+        <div class="usage-label">Lead Finder Searches</div>
+        <div class="usage-bar-wrap"><div class="usage-bar" id="bar-searches" style="width:0%"></div></div>
+        <div class="usage-val" id="val-searches">0 / 0</div>
+      </div>
+      <div class="usage-row">
+        <div class="usage-label">Campaigns</div>
+        <div class="usage-bar-wrap"><div class="usage-bar" id="bar-campaigns" style="width:0%"></div></div>
+        <div class="usage-val" id="val-campaigns">0 / 0</div>
+      </div>
+    </div>
+
+    <!-- BILLING -->
+    <div class="card">
+      <div class="card-title">Billing</div>
+      <div class="alert alert-info">To update your payment method or view invoices, visit the Stripe customer portal.</div>
+      <a href="#" onclick="openBillingPortal()" class="btn">Open Billing Portal →</a>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="card" style="border-color:rgba(255,95,95,0.2)">
+      <div class="card-title" style="color:var(--danger)">Danger Zone</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">These actions are permanent and cannot be undone.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-danger" onclick="confirmDeleteData()">Delete All My Data</button>
+        <button class="btn btn-danger" onclick="confirmDeleteAccount()">Delete Account</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://eyofcybilytepouerssp.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5b2ZjeWJpbHl0ZXBvdWVyc3NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3ODk3MDMsImV4cCI6MjA5MTM2NTcwM30.6Kj2I5guyQFaBW3EryWMeWGzbmitMfBCRdTMXzBR3ZE';
+
+const PLAN_LIMITS = {
+  starter: { contacts: 500, sms: 1000, searches: 5, campaigns: 3 },
+  pro:     { contacts: 2500, sms: 5000, searches: 20, campaigns: 10 },
+  agency:  { contacts: '∞', sms: '∞', searches: '∞', campaigns: '∞' },
+};
+const PLAN_DESCS = {
+  starter: '$49/month — 500 contacts, 1,000 SMS, 5 searches',
+  pro: '$97/month — 2,500 contacts, 5,000 SMS, 20 searches',
+  agency: '$197/month — Unlimited everything, 3 team seats',
+};
+
+async function loadAccount() {
+  const token = localStorage.getItem('norx-auth-token');
+  const userId = localStorage.getItem('norx-user-id');
+  const email = localStorage.getItem('norx-user-email');
+  if (!token || !userId) { window.location.href = '/login'; return; }
+
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=*`, {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` }
+    });
+    const profiles = await resp.json();
+    const profile = profiles?.[0];
+    if (!profile) { window.location.href = '/login'; return; }
+
+    const plan = profile.plan || 'starter';
+    const limits = PLAN_LIMITS[plan];
+
+    // Plan badge
+    const badge = document.getElementById('plan-badge');
+    badge.textContent = plan.charAt(0).toUpperCase() + plan.slice(1) + (profile.is_beta ? ' (Beta)' : '');
+    badge.className = `plan-badge plan-${plan}`;
+    document.getElementById('plan-desc').textContent = PLAN_DESCS[plan] || '';
+    document.getElementById('sub-status').textContent = profile.subscription_status || '—';
+    document.getElementById('account-email').textContent = email || profile.email || '—';
+
+    const trialEnds = profile.trial_ends_at ? new Date(profile.trial_ends_at).toLocaleDateString() : '—';
+    document.getElementById('trial-ends').textContent = trialEnds;
+
+    // Usage
+    const month = new Date().toISOString().slice(0, 7);
+    const uResp = await fetch(`${SUPABASE_URL}/rest/v1/usage?user_id=eq.${userId}&month=eq.${month}&select=*`, {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` }
+    });
+    const usageRows = await uResp.json();
+    const u = usageRows?.[0] || {};
+
+    setUsageBar('contacts', u.contacts_count || 0, limits.contacts);
+    setUsageBar('sms', u.sms_sent || 0, limits.sms);
+    setUsageBar('searches', u.finder_searches || 0, limits.searches);
+    setUsageBar('campaigns', u.campaigns_count || 0, limits.campaigns);
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('account-content').style.display = 'block';
+  } catch(e) {
+    document.getElementById('loading').textContent = 'Error loading account. Please refresh.';
+  }
+}
+
+function setUsageBar(type, used, limit) {
+  const isInf = limit === '∞' || limit === Infinity;
+  const pct = isInf ? 5 : Math.min(100, Math.round((used / limit) * 100));
+  const bar = document.getElementById('bar-' + type);
+  const val = document.getElementById('val-' + type);
+  bar.style.width = pct + '%';
+  bar.className = 'usage-bar' + (pct > 90 ? ' danger' : pct > 70 ? ' warn' : '');
+  val.textContent = used + ' / ' + (isInf ? '∞' : limit);
+}
+
+function confirmCancel() {
+  if (confirm('Are you sure you want to cancel your subscription? You will keep access until the end of your billing period.')) {
+    alert('To cancel, please email support@norxai.com and we will process your cancellation within 24 hours. We will also add a self-serve cancel button soon.');
+  }
+}
+
+function confirmDeleteData() {
+  if (confirm('Delete ALL your contacts, campaigns and conversations? This cannot be undone.')) {
+    localStorage.clear();
+    alert('Your local data has been cleared.');
+  }
+}
+
+function confirmDeleteAccount() {
+  if (confirm('Permanently delete your account? This cannot be undone.')) {
+    alert('To delete your account, email support@norxai.com with subject: "Delete Account". We will process within 24 hours.');
+  }
+}
+
+function openBillingPortal() {
+  alert('Billing portal coming soon. For now email support@norxai.com for billing changes.');
+}
+
+function logout() {
+  localStorage.removeItem('norx-auth-token');
+  localStorage.removeItem('norx-user-id');
+  localStorage.removeItem('norx-user-email');
+  window.location.href = '/login';
+}
+
+loadAccount();
+</script>
+</body>
+</html>

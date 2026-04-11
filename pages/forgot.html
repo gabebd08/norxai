@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password — Norx AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080a0e;--bg2:#0d1017;--bg3:#131720;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#eef0f4;--text2:#7c8494;--text3:#3d4556;--accent:#00d4ff;--green:#00e5a0;--danger:#ff5f5f;--r:8px;--r-lg:12px;--r-xl:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:36px;text-decoration:none}
+.logo-mark{width:36px;height:36px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-size:20px;font-weight:700;color:var(--text)}
+.logo-text span{color:var(--accent)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-xl);padding:36px;width:100%;max-width:400px}
+.card-title{font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+.card-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
+input{width:100%;padding:11px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Syne',sans-serif;font-size:14px;outline:none;transition:border-color 0.15s}
+input:focus{border-color:var(--accent)}
+input::placeholder{color:var(--text3)}
+.btn-full{width:100%;padding:13px;font-size:14px;font-weight:700;border-radius:var(--r-lg);border:none;cursor:pointer;font-family:'Syne',sans-serif;background:var(--accent);color:var(--bg);transition:all 0.15s}
+.btn-full:hover{background:#00b8db}
+.btn-full:disabled{opacity:0.6;cursor:not-allowed}
+.back-link{text-align:center;font-size:13px;color:var(--text2);margin-top:20px}
+.back-link a{color:var(--accent);text-decoration:none;font-weight:600}
+.success{background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.25);border-radius:var(--r);padding:14px;font-size:13px;color:var(--green);text-align:center;display:none;line-height:1.6}
+.error{background:rgba(255,95,95,0.1);border:1px solid rgba(255,95,95,0.25);border-radius:var(--r);padding:10px 13px;font-size:13px;color:var(--danger);margin-bottom:14px;display:none}
+</style>
+</head>
+<body>
+<a href="/" class="logo">
+  <div class="logo-mark"><svg viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#080a0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <div class="logo-text">Norx<span> AI</span></div>
+</a>
+<div class="card">
+  <div class="card-title">Reset your password</div>
+  <div class="card-sub">Enter your email and we'll send you a reset link</div>
+  <div class="error" id="error"></div>
+  <div class="success" id="success">
+    ✓ Check your email!<br>We sent a password reset link to <strong id="sent-email"></strong>.<br>It may take a minute to arrive.
+  </div>
+  <div id="form-wrap">
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="email" placeholder="you@youragency.com" onkeydown="if(event.key==='Enter')sendReset()">
+    </div>
+    <button class="btn-full" id="btn" onclick="sendReset()">Send reset link</button>
+  </div>
+  <div class="back-link"><a href="/login">← Back to login</a></div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://eyofcybilytepouerssp.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5b2ZjeWJpbHl0ZXBvdWVyc3NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3ODk3MDMsImV4cCI6MjA5MTM2NTcwM30.6Kj2I5guyQFaBW3EryWMeWGzbmitMfBCRdTMXzBR3ZE';
+
+async function sendReset() {
+  const email = document.getElementById('email').value.trim();
+  const btn = document.getElementById('btn');
+  const errorEl = document.getElementById('error');
+  errorEl.style.display = 'none';
+  if (!email) { errorEl.textContent = 'Enter your email address.'; errorEl.style.display = 'block'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+      body: JSON.stringify({ email }),
+    });
+    document.getElementById('sent-email').textContent = email;
+    document.getElementById('form-wrap').style.display = 'none';
+    document.getElementById('success').style.display = 'block';
+  } catch(e) {
+    errorEl.textContent = 'Something went wrong. Try again.';
+    errorEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Send reset link';
+  }
+}
+</script>
+</body>
+</html>
