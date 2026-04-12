@@ -129,10 +129,29 @@ function resetBtn() {
   document.getElementById('btn-text').textContent = 'Log in →';
 }
 
-// Auto-redirect if already logged in
-if (localStorage.getItem('norx-auth-token')) {
-  window.location.href = '/app';
+// Auto-redirect if already logged in — but validate token first
+async function checkExistingSession() {
+  const token = localStorage.getItem('norx-auth-token');
+  if (!token) return;
+  // Verify token is still valid before redirecting
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` }
+    });
+    if (resp.ok) {
+      window.location.href = '/app';
+    } else {
+      // Token expired or invalid — clear it and stay on login
+      localStorage.removeItem('norx-auth-token');
+      localStorage.removeItem('norx-user-id');
+      localStorage.removeItem('norx-user-email');
+      localStorage.removeItem('norx-refresh-token');
+    }
+  } catch(e) {
+    // Network error — don't redirect, let user try logging in
+  }
 }
+checkExistingSession();
 </script>
 </body>
 </html>

@@ -881,6 +881,28 @@ async function init(){
     window.location.href='/login';
     return;
   }
+  // Validate token with Supabase before proceeding
+  try{
+    const authCheck=await fetch(SB_URL+'/auth/v1/user',{
+      headers:{'apikey':SB_ANON,'Authorization':'Bearer '+token}
+    });
+    if(!authCheck.ok){
+      // Token invalid — clear and redirect to login
+      localStorage.removeItem('norx-auth-token');
+      localStorage.removeItem('norx-user-id');
+      localStorage.removeItem('norx-user-email');
+      localStorage.removeItem('norx-refresh-token');
+      window.location.href='/login';
+      return;
+    }
+    // Update user id from validated session
+    const authData=await authCheck.json();
+    if(authData.id) localStorage.setItem('norx-user-id',authData.id);
+    if(authData.email) localStorage.setItem('norx-user-email',authData.email);
+  }catch(e){
+    // Network error — continue with cached data
+    console.warn('Auth validation failed, using cached session:',e);
+  }
   currentUser={id:userId,email,token,plan:localStorage.getItem('norx-user-plan')||'starter'};
 
   // ── Load from Supabase first, fallback to localStorage ──
