@@ -194,170 +194,128 @@ input::placeholder{color:var(--text3)}
 </div>
 
 <script>
-// ── CONFIG ──────────────────────────────
-// Replace with your actual Stripe publishable key
-const STRIPE_PK = 'pk_live_51SqGqsDu5ohsJk2nA3CxNJ46OjzvD21NqsyoblgZ10rvZ0qlf4fqfkAWFvP7Hmzd7gduhh92DrQ6oMhIvzUJ850G00cKnPFToR';
 const SUPABASE_URL = 'https://eyofcybilytepouerssp.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5b2ZjeWJpbHl0ZXBvdWVyc3NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3ODk3MDMsImV4cCI6MjA5MTM2NTcwM30.6Kj2I5guyQFaBW3EryWMeWGzbmitMfBCRdTMXzBR3ZE';
-
-// Price IDs from your Stripe dashboard
+const STRIPE_PK = 'pk_live_51SqGqsDu5ohsJk2nA3CxNJ46OjzvD21NqsyoblgZ10rvZ0qlf4fqfkAWFvP7Hmzd7gduhh92DrQ6oMhIvzUJ850G00cKnPFToR';
 const PRICE_IDS = {
   starter: 'price_1TKapjDu5ohsJk2n3RjwUVV1',
   pro: 'price_1TKapxDu5ohsJk2nHsjthIhX',
   agency: 'price_1TKaqBDu5ohsJk2nzcbpUDwN',
 };
-
-// ── BETA ACCESS CODES ──────────────────────────────
-// Add codes here to give friends free access — any plan, no payment needed
 const BETA_CODES = {
   'NORX-BETA-2026': { plan: 'agency', label: 'Agency (Beta)' },
-  'NORXFRIEND1':    { plan: 'pro',    label: 'Pro (Beta)' },
-  'NORXFRIEND2':    { plan: 'pro',    label: 'Pro (Beta)' },
-  'NORXFRIEND3':    { plan: 'pro',    label: 'Pro (Beta)' },
-  'NORXFRIEND4':    { plan: 'pro',    label: 'Pro (Beta)' },
-  'NORXFRIEND5':    { plan: 'pro',    label: 'Pro (Beta)' },
-  // Add more codes as needed
+  'NORXFRIEND1': { plan: 'pro', label: 'Pro (Beta)' },
+  'NORXFRIEND2': { plan: 'pro', label: 'Pro (Beta)' },
+  'NORXFRIEND3': { plan: 'pro', label: 'Pro (Beta)' },
+  'NORXFRIEND4': { plan: 'pro', label: 'Pro (Beta)' },
+  'NORXFRIEND5': { plan: 'pro', label: 'Pro (Beta)' },
 };
+
+let selectedPlan = 'pro';
 let betaCodeApplied = false;
 let betaCodePlan = null;
 
-function applyBetaCode() {
-  const code = document.getElementById('beta-code').value.trim().toUpperCase();
-  const msgEl = document.getElementById('beta-code-msg');
-  const btn = document.getElementById('beta-apply-btn');
-
-  if (!code) { msgEl.textContent = 'Enter a code first.'; msgEl.style.color = 'var(--danger)'; msgEl.style.display = 'block'; return; }
-
-  const match = BETA_CODES[code];
-  if (!match) {
-    msgEl.textContent = '✕ Invalid code. Check with Gabe for a valid beta code.';
-    msgEl.style.color = 'var(--danger)';
-    msgEl.style.display = 'block';
-    betaCodeApplied = false;
-    return;
-  }
-
-  betaCodeApplied = true;
-  betaCodePlan = match.plan;
-
-  // Select the matching plan visually
-  document.querySelectorAll('.plan-option').forEach(p => p.classList.remove('selected'));
-  const planEl = document.querySelector(`[data-plan="${match.plan}"]`);
-  if (planEl) { planEl.classList.add('selected'); selectedPlan = match.plan; }
-
-  msgEl.textContent = `✓ Beta code applied — ${match.label} access, free forever!`;
-  msgEl.style.color = 'var(--green)';
-  msgEl.style.display = 'block';
-  btn.textContent = '✓ Applied';
-  btn.style.color = 'var(--green)';
-  btn.style.borderColor = 'rgba(0,229,160,0.3)';
-
-  // Hide payment section
-  document.querySelector('.form-divider').style.display = 'none';
-  document.getElementById('card-element').closest('.form-group').style.display = 'none';
-  document.getElementById('submit-btn').querySelector('#btn-text').textContent = 'Create beta account →';
-
-  // Update plan displays to lock in selection
-  document.querySelectorAll('.plan-option').forEach(p => {
-    p.style.opacity = p.dataset.plan === match.plan ? '1' : '0.4';
-    p.style.pointerEvents = 'none';
-  });
-}
-
-// ── STRIPE SETUP ──────────────────────────────
+// Stripe setup
 const stripe = Stripe(STRIPE_PK.trim());
 const elements = stripe.elements({
   appearance: {
     theme: 'night',
-    variables: {
-      colorBackground: '#131720',
-      colorText: '#eef0f4',
-      colorTextPlaceholder: '#3d4556',
-      fontFamily: 'Syne, sans-serif',
-      borderRadius: '8px',
-    }
+    variables: { colorBackground: '#131720', colorText: '#eef0f4', colorTextPlaceholder: '#3d4556', fontFamily: 'Syne, sans-serif', borderRadius: '8px' }
   }
 });
 const cardElement = elements.create('card', {
-  style: {
-    base: { fontSize: '14px', color: '#eef0f4', '::placeholder': { color: '#3d4556' } }
-  }
+  style: { base: { fontSize: '14px', color: '#eef0f4', '::placeholder': { color: '#3d4556' } } }
 });
 cardElement.mount('#card-element');
 cardElement.on('change', e => {
   document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
 });
 
-// ── PLAN SELECTION ──────────────────────────────
-let selectedPlan = 'pro';
+// Plan selection
 function selectPlan(el) {
   document.querySelectorAll('.plan-option').forEach(p => p.classList.remove('selected'));
   el.classList.add('selected');
   selectedPlan = el.dataset.plan;
 }
 
-// Pre-select plan from URL param
+// Pre-select plan from URL
 const urlPlan = new URLSearchParams(window.location.search).get('plan');
 if (urlPlan) {
-  const planEl = document.querySelector(`[data-plan="${urlPlan}"]`);
-  if (planEl) {
-    document.querySelectorAll('.plan-option').forEach(p => p.classList.remove('selected'));
-    planEl.classList.add('selected');
-    selectedPlan = urlPlan;
-  }
+  const planEl = document.querySelector('[data-plan="' + urlPlan + '"]');
+  if (planEl) { selectPlan(planEl); }
 }
 
-// ── SIGNUP ──────────────────────────────
+// Beta code
+function applyBetaCode() {
+  const code = document.getElementById('beta-code').value.trim().toUpperCase();
+  const msgEl = document.getElementById('beta-code-msg');
+  const btn = document.getElementById('beta-apply-btn');
+  if (!code) { msgEl.textContent = 'Enter a code first.'; msgEl.style.color = 'var(--danger)'; msgEl.style.display = 'block'; return; }
+  const match = BETA_CODES[code];
+  if (!match) {
+    msgEl.textContent = '✕ Invalid code.';
+    msgEl.style.color = 'var(--danger)';
+    msgEl.style.display = 'block';
+    betaCodeApplied = false;
+    return;
+  }
+  betaCodeApplied = true;
+  betaCodePlan = match.plan;
+  document.querySelectorAll('.plan-option').forEach(p => p.classList.remove('selected'));
+  const planEl = document.querySelector('[data-plan="' + match.plan + '"]');
+  if (planEl) { planEl.classList.add('selected'); selectedPlan = match.plan; }
+  msgEl.textContent = '✓ Beta code applied — ' + match.label + ' access, free!';
+  msgEl.style.color = 'var(--green)';
+  msgEl.style.display = 'block';
+  btn.textContent = '✓ Applied';
+  btn.style.color = 'var(--green)';
+  btn.style.borderColor = 'rgba(0,229,160,0.3)';
+  document.querySelector('.form-divider').style.display = 'none';
+  document.getElementById('card-element').closest('.form-group').style.display = 'none';
+  document.getElementById('submit-btn').querySelector('#btn-text').textContent = 'Create beta account →';
+  document.querySelectorAll('.plan-option').forEach(p => { p.style.opacity = p.dataset.plan === match.plan ? '1' : '0.4'; p.style.pointerEvents = 'none'; });
+}
+
+// Main signup handler
 async function handleSignup() {
   const btn = document.getElementById('submit-btn');
   const spinner = document.getElementById('spinner');
   const btnText = document.getElementById('btn-text');
   const errorEl = document.getElementById('form-error');
-
   const firstName = document.getElementById('first-name').value.trim();
   const lastName = document.getElementById('last-name').value.trim();
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
   const agencyName = document.getElementById('agency-name').value.trim();
 
-  // Validate
   errorEl.style.display = 'none';
   if (!firstName || !lastName) { showError('Please enter your full name.'); return; }
   if (!email || !email.includes('@')) { showError('Please enter a valid email address.'); return; }
   if (password.length < 8) { showError('Password must be at least 8 characters.'); return; }
 
-  // Loading state
   btn.disabled = true;
   spinner.style.display = 'block';
   btnText.textContent = 'Creating account...';
 
   try {
-    // Beta code path — skip Stripe entirely
     if (betaCodeApplied && betaCodePlan) {
+      // ── BETA PATH ──
       btnText.textContent = 'Creating beta account...';
-
-      // Step 1: Sign up
-      const signupResp = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+      const signupResp = await fetch(SUPABASE_URL + '/auth/v1/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
         body: JSON.stringify({ email, password, data: { first_name: firstName, last_name: lastName, agency_name: agencyName, plan: betaCodePlan, beta: true } }),
       });
       const sd = await signupResp.json();
-
-      if (sd.error) {
-        // If user already exists, try signing in directly
-        if (sd.error.message && sd.error.message.toLowerCase().includes('already registered')) {
-          btnText.textContent = 'Account exists, signing in...';
-        } else {
-          showError(sd.error.message || 'Signup failed.');
-          resetBtn();
-          return;
-        }
+      if (sd.error && !sd.error.message.toLowerCase().includes('already registered')) {
+        showError(sd.error.message || 'Signup failed.');
+        resetBtn();
+        return;
       }
 
-      // Step 2: Always sign in immediately after signup to get a valid token
+      // Sign in immediately to get token
       btnText.textContent = 'Signing in...';
-      const loginResp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      const loginResp = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
         body: JSON.stringify({ email, password }),
@@ -365,163 +323,82 @@ async function handleSignup() {
       const ld = await loginResp.json();
 
       if (ld.access_token) {
-        // Successfully signed in
         localStorage.setItem('norx-auth-token', ld.access_token);
         localStorage.setItem('norx-refresh-token', ld.refresh_token || '');
         localStorage.setItem('norx-user-id', ld.user?.id || sd.user?.id || '');
         localStorage.setItem('norx-user-email', email);
         localStorage.setItem('norx-user-plan', betaCodePlan);
         localStorage.setItem('norx-user-meta', JSON.stringify({ first_name: firstName, last_name: lastName, agency_name: agencyName }));
-
-        // Update profile with beta status
         try {
           const uid = ld.user?.id || sd.user?.id;
           if (uid) {
-            await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${uid}`, {
+            await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + uid, {
               method: 'PATCH',
-              headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${ld.access_token}`, 'Prefer': 'return=minimal' },
+              headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + ld.access_token, 'Prefer': 'return=minimal' },
               body: JSON.stringify({ plan: betaCodePlan, subscription_status: 'active', is_beta: true }),
             });
           }
         } catch(e) {}
-
         btnText.textContent = 'Success! Entering app...';
         window.location.href = '/app';
         return;
       }
 
-      // Login failed after signup — email confirmation still required
-      if (ld.error && ld.error.toLowerCase().includes('email')) {
-        showError('Please check your email and click the confirmation link, then try logging in.');
-      } else {
-        showError(ld.error_description || ld.error || 'Account created but login failed. Try logging in manually.');
-      }
-      resetBtn();
-      return;
-
-      // Dead code below kept for structure
-      // end of beta path
-      if (false) {
-
-      // Check if email confirmation is required
-      if (!sd.access_token && sd.user && !sd.user.confirmed_at) {
-        // Email confirmation required — show message
-        document.querySelector('.form-card').innerHTML = `
-          <div style="text-align:center;padding:20px">
-            <div style="width:56px;height:56px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-9" stroke="#00e5a0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div style="font-size:20px;font-weight:700;margin-bottom:8px">Check your email!</div>
-            <div style="font-size:13px;color:#7c8494;line-height:1.7;margin-bottom:20px">
-              We sent a confirmation link to <strong style="color:#eef0f4">${email}</strong>.<br>
-              Click it to activate your beta account — then come back and log in.
-            </div>
-            <a href="/login" style="display:inline-block;padding:12px 24px;background:#00d4ff;color:#080a0e;border-radius:8px;font-weight:700;text-decoration:none;font-family:Syne,sans-serif">Go to Login →</a>
-          </div>`;
+      if (ld.error) {
+        showError('Account created! Please check your email to confirm your account, then log in.');
+        resetBtn();
         return;
       }
 
-      // Account created and confirmed — store tokens and go to app
-      if (sd.access_token) {
-        localStorage.setItem('norx-auth-token', sd.access_token);
-        localStorage.setItem('norx-user-id', sd.user?.id || '');
-        localStorage.setItem('norx-user-email', email);
-        localStorage.setItem('norx-user-plan', betaCodePlan);
-        // Update profile with beta status
-        try {
-          await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${sd.user?.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${sd.access_token}` },
-            body: JSON.stringify({ plan: betaCodePlan, subscription_status: 'active', is_beta: true }),
-          });
-        } catch(e) {}
-        btnText.textContent = 'Account created! Redirecting...';
-        window.location.href = '/app';
-        return;
+    } else {
+      // ── STRIPE PATH ──
+      const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: { name: firstName + ' ' + lastName, email },
+      });
+      if (pmError) { showError(pmError.message); resetBtn(); return; }
+
+      const signupResp2 = await fetch(SUPABASE_URL + '/auth/v1/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+        body: JSON.stringify({ email, password, data: { first_name: firstName, last_name: lastName, agency_name: agencyName } }),
+      });
+      const signupData = await signupResp2.json();
+      if (signupData.error) { showError(signupData.error.message || 'Signup failed.'); resetBtn(); return; }
+
+      const userId = signupData.user?.id;
+      const accessToken = signupData.access_token;
+
+      const subResp = await fetch(SUPABASE_URL + '/functions/v1/create-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
+        body: JSON.stringify({ payment_method_id: paymentMethod.id, plan: selectedPlan, price_id: PRICE_IDS[selectedPlan], email, name: firstName + ' ' + lastName, agency_name: agencyName, user_id: userId }),
+      });
+      const subData = await subResp.json();
+      if (subData.error) { showError(subData.error); resetBtn(); return; }
+
+      if (subData.requires_action) {
+        const { error: confirmError } = await stripe.confirmCardPayment(subData.client_secret);
+        if (confirmError) { showError(confirmError.message); resetBtn(); return; }
       }
 
-      // Fallback — show email confirmation message
-      document.querySelector('.form-card').innerHTML = `
-        <div style="text-align:center;padding:20px">
-          <div style="font-size:20px;font-weight:700;margin-bottom:8px">Check your email!</div>
-          <div style="font-size:13px;color:#7c8494;line-height:1.7;margin-bottom:20px">
-            We sent a confirmation link to <strong style="color:#eef0f4">${email}</strong>.<br>
-            Click it to activate your account then come back and log in.
-          </div>
-          <a href="/login" style="display:inline-block;padding:12px 24px;background:#00d4ff;color:#080a0e;border-radius:8px;font-weight:700;text-decoration:none;font-family:Syne,sans-serif">Go to Login →</a>
-        </div>`;
-      return;
+      localStorage.setItem('norx-auth-token', accessToken);
+      localStorage.setItem('norx-user-id', userId);
+      localStorage.setItem('norx-user-email', email);
+      localStorage.setItem('norx-user-plan', selectedPlan);
+      localStorage.setItem('norx-user-meta', JSON.stringify({ first_name: firstName, last_name: lastName, agency_name: agencyName }));
+      btnText.textContent = 'Account created! Redirecting...';
+      window.location.href = '/app';
     }
-
-    // Step 1: Create Stripe payment method
-    const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: cardElement,
-      billing_details: { name: `${firstName} ${lastName}`, email },
-    });
-    if (pmError) { showError(pmError.message); resetBtn(); return; }
-
-    // Step 2: Create user in Supabase Auth
-    const signupResp2 = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
-      body: JSON.stringify({ email, password, data: { first_name: firstName, last_name: lastName, agency_name: agencyName } }),
-    });
-    const signupData = await signupResp2.json();
-    if (signupData.error) { showError(signupData.error.message || 'Signup failed. Try again.'); resetBtn(); return; }
-
-    const userId = signupData.user?.id;
-    const accessToken = signupData.access_token;
-
-    // Step 3: Create Stripe customer + subscription via your backend function
-    // This calls a Supabase Edge Function that creates the Stripe customer and subscription
-    const subResp = await fetch(`${SUPABASE_URL}/functions/v1/create-subscription`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
-      body: JSON.stringify({
-        payment_method_id: paymentMethod.id,
-        plan: selectedPlan,
-        price_id: PRICE_IDS[selectedPlan],
-        email,
-        name: `${firstName} ${lastName}`,
-        agency_name: agencyName,
-        user_id: userId,
-      }),
-    });
-    const subData = await subResp.json();
-    if (subData.error) { showError(subData.error); resetBtn(); return; }
-
-    // Step 4: Handle 3D Secure if required
-    if (subData.requires_action) {
-      const { error: confirmError } = await stripe.confirmCardPayment(subData.client_secret);
-      if (confirmError) { showError(confirmError.message); resetBtn(); return; }
-    }
-
-    // Step 5: Success — redirect to app
-    btnText.textContent = 'Account created! Redirecting...';
-    localStorage.setItem('norx-auth-token', accessToken);
-    localStorage.setItem('norx-user-plan', selectedPlan);
-    window.location.href = '/app';
-
   } catch (err) {
-    showError('Something went wrong. Please try again or contact support.');
+    showError('Something went wrong. Please try again.');
     resetBtn();
   }
 }
 
-function showError(msg) {
-  const el = document.getElementById('form-error');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-function resetBtn() {
-  const btn = document.getElementById('submit-btn');
-  const spinner = document.getElementById('spinner');
-  const btnText = document.getElementById('btn-text');
-  btn.disabled = false;
-  spinner.style.display = 'none';
-  btnText.textContent = 'Start free trial →';
-}
+function showError(msg) { const el = document.getElementById('form-error'); el.textContent = msg; el.style.display = 'block'; }
+function resetBtn() { const btn = document.getElementById('submit-btn'); btn.disabled = false; document.getElementById('spinner').style.display = 'none'; document.getElementById('btn-text').textContent = 'Start free trial →'; }
 </script>
 </body>
 </html>
