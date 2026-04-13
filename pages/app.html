@@ -877,20 +877,20 @@ const PLAN_LIMITS={
 
 let currentUser=null; // {id, email, token, plan, isBeta}
 
-async async function sbFetch(path,opts={}){
+async function sbFetch(path,opts={}){
   const headers={'apikey':SB_ANON,'Content-Type':'application/json',...(currentUser?{'Authorization':'Bearer '+currentUser.token}:{}),  ...(opts.headers||{})};
   const r=await fetch(SB_URL+'/rest/v1/'+path,{...opts,headers});
   if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'DB '+r.status);}
   const t=await r.text();return t?JSON.parse(t):null;
 }
 
-async async function getProfile(){
+async function getProfile(){
   if(!currentUser) return null;
   try{const rows=await sbFetch('profiles?id=eq.'+currentUser.id+'&select=*');return rows?.[0]||null;}
   catch(e){return null;}
 }
 
-async async function checkPlanLimit(type){
+async function checkPlanLimit(type){
   if(!currentUser) return {ok:true};
   const profile=await getProfile();
   if(!profile||profile.is_beta) return {ok:true};
@@ -909,7 +909,7 @@ async async function checkPlanLimit(type){
   return{ok:true};
 }
 
-async async function incrementUsage(type,amount=1){
+async function incrementUsage(type,amount=1){
   if(!currentUser) return;
   const month=new Date().toISOString().slice(0,7);
   const field={contact:'contacts_count',sms:'sms_sent',search:'finder_searches',campaign:'campaigns_count'}[type];
