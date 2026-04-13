@@ -276,7 +276,7 @@ select option{background:var(--bg3);color:var(--text)}
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M2 3l6 5.5L14 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
       Inbox <span class="nav-badge nav-badge-red" id="badge-inbox" style="display:none">0</span>
     </div>
-<div class="nav-item" data-page="calllist" onclick="nav(this);renderCallList()">
+<div class="nav-item" data-page="calllist" onclick="nav(this);ensureContactsLoaded().then(renderCallList)">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 2h2.5l1 3-1.5 1a8 8 0 004 4l1-1.5 3 1V13a1 1 0 01-1 1C6 14 2 10 2 4a1 1 0 011-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       Call List
     </div>
@@ -2238,15 +2238,24 @@ function setCallStatus(id, status){
   renderCallList();
 }
 
+async function ensureContactsLoaded(){
+  if(contacts && contacts.length > 0) return;
+  // Load from localStorage as fallback
+  try{
+    const stored = localStorage.getItem('norx-contacts');
+    if(stored){
+      const parsed = JSON.parse(stored);
+      if(parsed && parsed.length > 0){
+        contacts = parsed;
+        return;
+      }
+    }
+  }catch(e){}
+  // Try Supabase
+  await loadDataFromSupabase();
+}
+
 function renderCallList(){
-  // If contacts not loaded yet, retry after short delay
-  if(!contacts || !contacts.length){
-    const tbody=document.getElementById('call-list-tbody');
-    const countEl=document.getElementById('call-list-count');
-    if(countEl) countEl.textContent='Loading contacts...';
-    setTimeout(renderCallList, 500);
-    return;
-  }
   const industryFilter=document.getElementById('cl-industry-filter')?.value||'';
   const stageFilter=document.getElementById('cl-stage-filter')?.value||'';
   const callStatusFilter=document.getElementById('cl-call-status-filter')?.value||'';
