@@ -341,17 +341,59 @@ async function handleSignup() {
         body: JSON.stringify({ email, password, data: { first_name: firstName, last_name: lastName, agency_name: agencyName, plan: betaCodePlan, beta: true } }),
       });
       const sd = await signupResp.json();
-      if (sd.error) { showError(sd.error.message || 'Signup failed.'); resetBtn(); return; }
-      // Mark as active beta in profile
-      await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${sd.user?.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${sd.access_token}` },
-        body: JSON.stringify({ plan: betaCodePlan, subscription_status: 'active', is_beta: true }),
-      });
-      localStorage.setItem('norx-auth-token', sd.access_token);
-      localStorage.setItem('norx-user-plan', betaCodePlan);
-      btnText.textContent = 'Beta account created! Redirecting...';
-      window.location.href = '/app';
+      if (sd.error) {
+        showError(sd.error.message || 'Signup failed. Try a different email or contact support.');
+        resetBtn();
+        return;
+      }
+
+      // Check if email confirmation is required
+      if (!sd.access_token && sd.user && !sd.user.confirmed_at) {
+        // Email confirmation required — show message
+        document.querySelector('.form-card').innerHTML = `
+          <div style="text-align:center;padding:20px">
+            <div style="width:56px;height:56px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-9" stroke="#00e5a0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font-size:20px;font-weight:700;margin-bottom:8px">Check your email!</div>
+            <div style="font-size:13px;color:#7c8494;line-height:1.7;margin-bottom:20px">
+              We sent a confirmation link to <strong style="color:#eef0f4">${email}</strong>.<br>
+              Click it to activate your beta account — then come back and log in.
+            </div>
+            <a href="/login" style="display:inline-block;padding:12px 24px;background:#00d4ff;color:#080a0e;border-radius:8px;font-weight:700;text-decoration:none;font-family:Syne,sans-serif">Go to Login →</a>
+          </div>`;
+        return;
+      }
+
+      // Account created and confirmed — store tokens and go to app
+      if (sd.access_token) {
+        localStorage.setItem('norx-auth-token', sd.access_token);
+        localStorage.setItem('norx-user-id', sd.user?.id || '');
+        localStorage.setItem('norx-user-email', email);
+        localStorage.setItem('norx-user-plan', betaCodePlan);
+        // Update profile with beta status
+        try {
+          await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${sd.user?.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${sd.access_token}` },
+            body: JSON.stringify({ plan: betaCodePlan, subscription_status: 'active', is_beta: true }),
+          });
+        } catch(e) {}
+        btnText.textContent = 'Account created! Redirecting...';
+        window.location.href = '/app';
+        return;
+      }
+
+      // Fallback — show email confirmation message
+      document.querySelector('.form-card').innerHTML = `
+        <div style="text-align:center;padding:20px">
+          <div style="font-size:20px;font-weight:700;margin-bottom:8px">Check your email!</div>
+          <div style="font-size:13px;color:#7c8494;line-height:1.7;margin-bottom:20px">
+            We sent a confirmation link to <strong style="color:#eef0f4">${email}</strong>.<br>
+            Click it to activate your account then come back and log in.
+          </div>
+          <a href="/login" style="display:inline-block;padding:12px 24px;background:#00d4ff;color:#080a0e;border-radius:8px;font-weight:700;text-decoration:none;font-family:Syne,sans-serif">Go to Login →</a>
+        </div>`;
       return;
     }
 
