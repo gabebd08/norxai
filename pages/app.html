@@ -858,6 +858,11 @@ select option{background:var(--bg3);color:var(--text)}
 </div></div>
 
 <script>
+// ── Global function proxies (defined early so HTML onclick works immediately) ──
+function nav(el){ window._navFn && window._navFn(el); }
+function openDetail(id){ window._openDetailFn && window._openDetailFn(id); }
+function openChatFromPipeline(id){ window._openChatFn && window._openChatFn(id); }
+
 // ═══════════════════════════════════════════════
 // SUPABASE CONFIG
 // ═══════════════════════════════════════════════
@@ -1872,7 +1877,7 @@ function populateTplSelect(id){
   sel.innerHTML='<option value="">-- Select template --</option>'+templates.map(t=>`<option value="${t.id}"${t.id==cur?' selected':''}>${t.name}</option>`).join('');
 }
 // Open chat directly from pipeline card
-function openChatFromPipeline(id){
+window._openChatFn = function(id){
   // Switch to inbox page
   const inboxNav = document.querySelector('[data-page=inbox]');
   nav(inboxNav);
@@ -2276,7 +2281,7 @@ function exportCSV(){
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='norx-contacts.csv';a.click();
   toast('CSV exported!','success');
 }
-function openDetail(id){
+window._openDetailFn = function(id){
   const c=contacts.find(x=>x.id===id||x.id==id);if(!c) return;
   currentDetailId=id;
   document.getElementById('d-title').textContent=c.name;
@@ -2494,7 +2499,7 @@ async function execFinderBlast(){
 // ═══════════════════════════════════════════════
 // NAV
 // ═══════════════════════════════════════════════
-function nav(el){
+window._navFn = function(el){
   const page=el.dataset.page;
   // Hide all pages
   document.querySelectorAll('[id^="pg-"]').forEach(p=>{p.style.display='none';});
