@@ -2687,6 +2687,7 @@ window._navFn = function(el){
   currentPage=page;renderAll();
   if(page==='finder') document.getElementById('finder-api-warn').style.display=getGKey()?'none':'block';
   if(page==='inbox') renderInbox();
+  if(page==='calllist') clRender();
 }
 
 // ═══════════════════════════════════════════════
