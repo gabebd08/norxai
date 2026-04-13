@@ -2216,6 +2216,10 @@ async function syncCampaign(camp){
 // CALL LIST — reads directly from contacts array
 // ══════════════════════════════════════════════
 function clOpen(){
+  // Force page visible
+  const pg = document.getElementById('pg-calllist');
+  if(pg) pg.style.display='flex';
+  
   // Populate industry dropdown fresh each time
   const ind = document.getElementById('cl-industry');
   if(ind){
@@ -2251,9 +2255,13 @@ function clGetStatus(c){
 }
 
 function clRender(){
+  // Force page visible first
+  const pg = document.getElementById('pg-calllist');
+  if(pg && pg.style.display==='none') pg.style.display='flex';
+  
   const list = document.getElementById('cl-list');
   const countEl = document.getElementById('cl-count');
-  if(!list) return;
+  if(!list){ setTimeout(clRender, 100); return; }
 
   const q = (document.getElementById('cl-search')?.value||'').toLowerCase();
   const ind = document.getElementById('cl-industry')?.value||'';
