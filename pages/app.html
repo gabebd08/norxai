@@ -1820,7 +1820,6 @@ function renderContacts(){
       <td><input type="checkbox" class="row-chk" data-id="${c.id}"></td>
       <td class="primary" onclick="openDetail(${c.id})" style="cursor:pointer">${c.name}</td>
       <td>${c.industry||'—'}</td><td class="mono">${c.phone||'—'}</td>
-      <td class="mono" style="font-size:11px">${c.email||'—'}</td>
       <td><select onchange="setStatus(${c.id},this.value)" style="width:auto;font-size:12px;padding:4px 8px">
         ${["Saved", "Opener Sent", "Engaged", "Warm", "Hot", "Booked", "Follow Up Later", "Called", "Closed", "Lost", "Opt-Out"].map(s=>`<option${s===c.status?' selected':''}>${s}</option>`).join('')}
       </select></td>
