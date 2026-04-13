@@ -2239,6 +2239,14 @@ function setCallStatus(id, status){
 }
 
 function renderCallList(){
+  // If contacts not loaded yet, retry after short delay
+  if(!contacts || !contacts.length){
+    const tbody=document.getElementById('call-list-tbody');
+    const countEl=document.getElementById('call-list-count');
+    if(countEl) countEl.textContent='Loading contacts...';
+    setTimeout(renderCallList, 500);
+    return;
+  }
   const industryFilter=document.getElementById('cl-industry-filter')?.value||'';
   const stageFilter=document.getElementById('cl-stage-filter')?.value||'';
   const callStatusFilter=document.getElementById('cl-call-status-filter')?.value||'';
