@@ -335,17 +335,73 @@ async function handleSignup() {
     // Beta code path — skip Stripe entirely
     if (betaCodeApplied && betaCodePlan) {
       btnText.textContent = 'Creating beta account...';
+
+      // Step 1: Sign up
       const signupResp = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
         body: JSON.stringify({ email, password, data: { first_name: firstName, last_name: lastName, agency_name: agencyName, plan: betaCodePlan, beta: true } }),
       });
       const sd = await signupResp.json();
+
       if (sd.error) {
-        showError(sd.error.message || 'Signup failed. Try a different email or contact support.');
-        resetBtn();
+        // If user already exists, try signing in directly
+        if (sd.error.message && sd.error.message.toLowerCase().includes('already registered')) {
+          btnText.textContent = 'Account exists, signing in...';
+        } else {
+          showError(sd.error.message || 'Signup failed.');
+          resetBtn();
+          return;
+        }
+      }
+
+      // Step 2: Always sign in immediately after signup to get a valid token
+      btnText.textContent = 'Signing in...';
+      const loginResp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+        body: JSON.stringify({ email, password }),
+      });
+      const ld = await loginResp.json();
+
+      if (ld.access_token) {
+        // Successfully signed in
+        localStorage.setItem('norx-auth-token', ld.access_token);
+        localStorage.setItem('norx-refresh-token', ld.refresh_token || '');
+        localStorage.setItem('norx-user-id', ld.user?.id || sd.user?.id || '');
+        localStorage.setItem('norx-user-email', email);
+        localStorage.setItem('norx-user-plan', betaCodePlan);
+        localStorage.setItem('norx-user-meta', JSON.stringify({ first_name: firstName, last_name: lastName, agency_name: agencyName }));
+
+        // Update profile with beta status
+        try {
+          const uid = ld.user?.id || sd.user?.id;
+          if (uid) {
+            await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${uid}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${ld.access_token}`, 'Prefer': 'return=minimal' },
+              body: JSON.stringify({ plan: betaCodePlan, subscription_status: 'active', is_beta: true }),
+            });
+          }
+        } catch(e) {}
+
+        btnText.textContent = 'Success! Entering app...';
+        window.location.href = '/app';
         return;
       }
+
+      // Login failed after signup — email confirmation still required
+      if (ld.error && ld.error.toLowerCase().includes('email')) {
+        showError('Please check your email and click the confirmation link, then try logging in.');
+      } else {
+        showError(ld.error_description || ld.error || 'Account created but login failed. Try logging in manually.');
+      }
+      resetBtn();
+      return;
+
+      // Dead code below kept for structure
+      const fakesd = sd;
+      if (fakesd.error) {
 
       // Check if email confirmation is required
       if (!sd.access_token && sd.user && !sd.user.confirmed_at) {
