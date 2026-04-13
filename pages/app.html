@@ -864,7 +864,7 @@ select option{background:var(--bg3);color:var(--text)}
 
 
 <!-- CALL LIST PAGE -->
-<div id="pg-calllist" class="page" style="display:none;height:100%;overflow:hidden;display:flex;flex-direction:column">
+<div id="pg-calllist" class="page" style="display:none;height:100%;overflow:hidden;flex-direction:column">
   <div style="padding:20px 28px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">
       <div>
@@ -2671,7 +2671,7 @@ window._navFn = function(el){
   document.querySelectorAll('[id^="pg-"]').forEach(p=>{p.style.display='none';});
   const pg=document.getElementById('pg-'+page);
   if(pg){
-    pg.style.display=(page==='inbox')?'block':'block';
+    pg.style.display=(page==='inbox'||page==='calllist')?'flex':'block';
   }
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   el.classList.add('active');
