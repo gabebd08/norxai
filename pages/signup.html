@@ -400,8 +400,8 @@ async function handleSignup() {
       return;
 
       // Dead code below kept for structure
-      const fakesd = sd;
-      if (fakesd.error) {
+      // end of beta path
+      if (false) {
 
       // Check if email confirmation is required
       if (!sd.access_token && sd.user && !sd.user.confirmed_at) {
@@ -462,12 +462,12 @@ async function handleSignup() {
     if (pmError) { showError(pmError.message); resetBtn(); return; }
 
     // Step 2: Create user in Supabase Auth
-    const signupResp = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+    const signupResp2 = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
       body: JSON.stringify({ email, password, data: { first_name: firstName, last_name: lastName, agency_name: agencyName } }),
     });
-    const signupData = await signupResp.json();
+    const signupData = await signupResp2.json();
     if (signupData.error) { showError(signupData.error.message || 'Signup failed. Try again.'); resetBtn(); return; }
 
     const userId = signupData.user?.id;
