@@ -276,6 +276,10 @@ select option{background:var(--bg3);color:var(--text)}
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M2 3l6 5.5L14 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
       Inbox <span class="nav-badge nav-badge-red" id="badge-inbox" style="display:none">0</span>
     </div>
+<div class="nav-item" data-page="calllist" onclick="nav(this);renderCallList()">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 2h2.5l1 3-1.5 1a8 8 0 004 4l1-1.5 3 1V13a1 1 0 01-1 1C6 14 2 10 2 4a1 1 0 011-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      Call List
+    </div>
     <div class="nav-item" data-page="finder" onclick="nav(this)">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       Lead Finder <span class="nav-badge nav-badge-new">v2</span>
@@ -857,6 +861,60 @@ select option{background:var(--bg3);color:var(--text)}
   <div class="modal-footer"><button class="btn" onclick="closeM('finder-blast')">Cancel</button><button class="btn btn-primary" onclick="execFinderBlast()">Send Blast</button></div>
 </div></div>
 
+<!-- CALL LIST PAGE -->
+<div id="pg-calllist" class="page" style="display:none;padding:0;overflow:hidden;height:100%">
+  <div style="padding:20px 28px 0;flex-shrink:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-0.5px">Call List</div>
+        <div style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace" id="call-list-count">Loading...</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="cl-industry-filter" onchange="renderCallList()" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:'Syne',sans-serif;font-size:12px">
+          <option value="">All Industries</option>
+        </select>
+        <select id="cl-stage-filter" onchange="renderCallList()" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:'Syne',sans-serif;font-size:12px">
+          <option value="">All Stages</option>
+          <option value="Saved">Saved</option>
+          <option value="Opener Sent">Opener Sent</option>
+          <option value="Engaged">Engaged</option>
+          <option value="Warm">Warm 🔥</option>
+          <option value="Hot">Hot 🚀</option>
+          <option value="Booked">Booked 📅</option>
+          <option value="Follow Up Later">Follow Up Later</option>
+          <option value="Called">Called</option>
+          <option value="Closed">Closed</option>
+          <option value="Lost">Lost</option>
+        </select>
+        <select id="cl-call-status-filter" onchange="renderCallList()" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:'Syne',sans-serif;font-size:12px">
+          <option value="">All Call Statuses</option>
+          <option value="Not Called">Not Called</option>
+          <option value="Need to Call">Need to Call</option>
+          <option value="No Answer">No Answer</option>
+          <option value="Called">Called ✓</option>
+          <option value="Opted Out">Opted Out</option>
+        </select>
+        <input type="text" id="cl-search" placeholder="Search..." oninput="renderCallList()" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Syne',sans-serif;font-size:12px;width:150px">
+      </div>
+    </div>
+  </div>
+  <div style="overflow-y:auto;height:calc(100% - 90px);padding:0 28px 28px" id="call-list-wrap">
+    <table style="width:100%;border-collapse:collapse" id="call-list-table">
+      <thead>
+        <tr style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;font-family:'JetBrains Mono',monospace;border-bottom:1px solid var(--border)">
+          <th style="padding:8px 12px;text-align:left;font-weight:600">Business</th>
+          <th style="padding:8px 12px;text-align:left;font-weight:600">Industry</th>
+          <th style="padding:8px 12px;text-align:left;font-weight:600">Phone</th>
+          <th style="padding:8px 12px;text-align:left;font-weight:600">Pipeline Stage</th>
+          <th style="padding:8px 12px;text-align:left;font-weight:600">Call Status</th>
+          <th style="padding:8px 12px;text-align:left;font-weight:600">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="call-list-tbody"></tbody>
+    </table>
+    <div id="call-list-empty" style="display:none;text-align:center;padding:48px;color:var(--text3);font-size:13px">No contacts match your filters.</div>
+  </div>
+</div>
 <script>
 // ── Global function proxies (defined early so HTML onclick works immediately) ──
 function nav(el){ window._navFn && window._navFn(el); }
@@ -2151,6 +2209,107 @@ async function syncCampaign(camp){
     }
   }catch(e){console.warn('syncCampaign:',e);}
   return camp;
+}
+
+// ── CALL LIST ──────────────────────────────────────────
+const CALL_STATUS_COLORS = {
+  'Not Called': 'var(--text3)',
+  'Need to Call': 'var(--warn)',
+  'No Answer': 'var(--accent)',
+  'Called': 'var(--green)',
+  'Opted Out': 'var(--danger)',
+};
+
+
+function getCallStatus(c){
+  if(c.status==='Opt-Out') return 'Opted Out';
+  return c.callStatus||'Not Called';
+}
+
+function setCallStatus(id, status){
+  const c=contacts.find(x=>x.id==id);
+  if(!c) return;
+  c.callStatus=status;
+  // Also update pipeline status if called
+  if(status==='Called' && c.status!=='Closed' && c.status!=='Lost' && c.status!=='Opt-Out'){
+    c.status='Called';
+  }
+  saveData();
+  renderCallList();
+}
+
+function renderCallList(){
+  const industryFilter=document.getElementById('cl-industry-filter')?.value||'';
+  const stageFilter=document.getElementById('cl-stage-filter')?.value||'';
+  const callStatusFilter=document.getElementById('cl-call-status-filter')?.value||'';
+  const searchQ=(document.getElementById('cl-search')?.value||'').toLowerCase();
+
+  // Populate industry dropdown
+  const industryEl=document.getElementById('cl-industry-filter');
+  if(industryEl){
+    const current=industryEl.value;
+    const industries=[...new Set(contacts.map(c=>c.industry).filter(Boolean))].sort();
+    industryEl.innerHTML='<option value="">All Industries</option>'+industries.map(i=>`<option value="${i}"${i===current?' selected':''}>${i}</option>`).join('');
+  }
+
+  // Filter contacts — exclude opt-outs from main list unless specifically filtered
+  let filtered=contacts.filter(c=>{
+    if(c.status==='Opt-Out' && !callStatusFilter) return false;
+    if(industryFilter && c.industry!==industryFilter) return false;
+    if(stageFilter && c.status!==stageFilter) return false;
+    const cs=getCallStatus(c);
+    if(callStatusFilter && cs!==callStatusFilter) return false;
+    if(searchQ && !(c.name||'').toLowerCase().includes(searchQ) && !(c.phone||'').includes(searchQ)) return false;
+    return true;
+  });
+
+  // Sort: Need to Call first, then Not Called, then others
+  const order={'Need to Call':0,'Not Called':1,'No Answer':2,'Called':3,'Opted Out':4};
+  filtered.sort((a,b)=>(order[getCallStatus(a)]||1)-(order[getCallStatus(b)]||1));
+
+  const tbody=document.getElementById('call-list-tbody');
+  const empty=document.getElementById('call-list-empty');
+  const countEl=document.getElementById('call-list-count');
+
+  if(countEl) countEl.textContent=`${filtered.length} contact${filtered.length!==1?'s':''} shown`;
+
+  if(!filtered.length){
+    if(tbody) tbody.innerHTML='';
+    if(empty) empty.style.display='block';
+    return;
+  }
+  if(empty) empty.style.display='none';
+
+  const stageColors={'Warm':'var(--warn)','Hot':'var(--danger)','Booked':'var(--green)','Closed':'var(--accent)','Engaged':'var(--purple,#a78bfa)'};
+
+  tbody.innerHTML=filtered.map(c=>{
+    const cs=getCallStatus(c);
+    const csColor=CALL_STATUS_COLORS[cs]||'var(--text3)';
+    const stageColor=stageColors[c.status]||'var(--text3)';
+    const phone=c.phone||'—';
+    const dialLink=c.phone?`<a href="tel:${c.phone}" style="color:var(--accent);text-decoration:none;font-family:'JetBrains Mono',monospace">${phone}</a>`:`<span style="color:var(--text3)">${phone}</span>`;
+    return `<tr style="border-bottom:1px solid var(--border);transition:background 0.1s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <td style="padding:12px;font-size:13px;font-weight:600;color:var(--text)">${escHtml(c.name)}</td>
+      <td style="padding:12px;font-size:12px;color:var(--text2)">${escHtml(c.industry||'—')}</td>
+      <td style="padding:12px;font-size:12px">${dialLink}</td>
+      <td style="padding:12px;font-size:12px;color:${stageColor};font-weight:600">${c.status}</td>
+      <td style="padding:12px">
+        <select onchange="setCallStatus(${c.id},this.value)" style="padding:4px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:${csColor};font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer">
+          <option value="Not Called"${cs==='Not Called'?' selected':''}>Not Called</option>
+          <option value="Need to Call"${cs==='Need to Call'?' selected':''}>Need to Call 📞</option>
+          <option value="No Answer"${cs==='No Answer'?' selected':''}>No Answer</option>
+          <option value="Called"${cs==='Called'?' selected':''}>Called ✓</option>
+          <option value="Opted Out"${cs==='Opted Out'?' selected':''}>Opted Out</option>
+        </select>
+      </td>
+      <td style="padding:12px">
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="openDetail(${c.id})" title="View contact">👤</button>
+          <button class="btn btn-sm" onclick="openChatFromPipeline(${c.id})" title="Open chat">💬</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 function renderAll(){
