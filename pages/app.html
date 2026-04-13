@@ -2073,7 +2073,7 @@ function finishOnboarding(){
   toast('Welcome to Norx AI! Start by searching for leads.','success');
 }
 
-function syncContact(contact){
+async function syncContact(contact){
   if(!currentUser) return contact;
   try{
     const row={
@@ -2094,7 +2094,7 @@ function syncContact(contact){
   return contact;
 }
 
-function syncAllContacts(){
+async function syncAllContacts(){
   if(!currentUser||!contacts.length) return;
   const toInsert=contacts.filter(c=>!c.dbId);
   const toUpdate=contacts.filter(c=>c.dbId);
@@ -2120,7 +2120,7 @@ function syncAllContacts(){
   }catch(e){console.warn('syncAllContacts:',e);}
 }
 
-function syncTemplate(tpl){
+async function syncTemplate(tpl){
   if(!currentUser) return tpl;
   try{
     const row={user_id:currentUser.id,name:tpl.name,body:tpl.body};
@@ -2134,7 +2134,7 @@ function syncTemplate(tpl){
   return tpl;
 }
 
-function syncCampaign(camp){
+async function syncCampaign(camp){
   if(!currentUser) return camp;
   try{
     const row={
