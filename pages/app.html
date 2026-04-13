@@ -298,8 +298,8 @@ select option{background:var(--bg3);color:var(--text)}
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
       Settings
     </div>
-    <div class="nav-item" onclick="window.location.href='/account'">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" fill="currentColor"/><path d="M1 14c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+    <div class="nav-item" data-page="account-center" onclick="nav(this);renderAccountCenter()">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M1 14c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
       My Account
     </div>
   </div>
@@ -389,7 +389,23 @@ select option{background:var(--bg3);color:var(--text)}
             <button class="btn btn-sm" onclick="pollRepliesNow()" title="Sync new replies" style="padding:4px 8px;font-size:11px">↻</button>
           </div>
         </div>
-        <div class="inbox-search-wrap"><input type="text" id="inbox-q" placeholder="Search..." oninput="renderInbox(this.value)"></div>
+        <div class="inbox-search-wrap">
+          <input type="text" id="inbox-q" placeholder="Search by name..." oninput="renderInbox(this.value)" style="margin-bottom:6px">
+          <select id="inbox-stage-filter" onchange="renderInbox(document.getElementById('inbox-q').value)" style="width:100%;font-size:11px;padding:5px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:'Syne',sans-serif">
+            <option value="">All stages</option>
+            <option value="Saved">Saved</option>
+            <option value="Opener Sent">Opener Sent</option>
+            <option value="Engaged">Engaged ⚡</option>
+            <option value="Warm">Warm 🔥</option>
+            <option value="Hot">Hot 🚀</option>
+            <option value="Booked">Booked 📅</option>
+            <option value="Follow Up Later">Follow Up Later ⏰</option>
+            <option value="Called">Called 📞</option>
+            <option value="Closed">Closed ✅</option>
+            <option value="Lost">Lost</option>
+            <option value="Opt-Out">Opt-Out</option>
+          </select>
+        </div>
         <div class="convo-list" id="convo-list"><div class="empty" style="padding:28px 14px;font-size:12px">No conversations yet.<br>Send a blast to get started.</div></div>
       </div>
       <div id="chat-panel-wrap" class="chat-panel">
@@ -475,7 +491,79 @@ select option{background:var(--bg3);color:var(--text)}
     </div>
   </div>
 
-  <div id="pg-settings" class="content" style="display:none">
+  
+<!-- ACCOUNT CENTER PAGE -->
+<div id="pg-account-center" class="page" style="display:none;padding:28px 32px;max-width:760px;overflow-y:auto;height:100%">
+  <div style="font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px">My Account</div>
+  <div style="font-size:13px;color:var(--text3);margin-bottom:28px;font-family:'JetBrains Mono',monospace">Your plan, usage, and performance overview</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px" id="ac-stats-grid">
+    <div class="stat-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:8px">Total Contacts</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:-1px" id="ac-total-contacts">0</div>
+    </div>
+    <div class="stat-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:8px">Total SMS Sent</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--accent)" id="ac-total-sms">0</div>
+    </div>
+    <div class="stat-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:8px">Total Replies</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--green)" id="ac-total-replies">0</div>
+    </div>
+    <div class="stat-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:8px">Reply Rate</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--warn)" id="ac-reply-rate">—</div>
+    </div>
+  </div>
+
+  <!-- Pipeline breakdown -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Pipeline Breakdown</div>
+    <div id="ac-pipeline-breakdown" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+  </div>
+
+  <!-- Template performance -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Template Performance</div>
+    <div id="ac-template-perf" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <!-- Account info -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Account Info</div>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:13px" id="ac-info">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--text3)">Agency</span>
+        <span id="ac-agency-name" style="color:var(--text);font-weight:600">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--text3)">Your name</span>
+        <span id="ac-user-name" style="color:var(--text);font-weight:600">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--text3)">Twilio number</span>
+        <span id="ac-twilio-num" style="color:var(--text);font-family:'JetBrains Mono',monospace">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0">
+        <span style="color:var(--text3)">Templates saved</span>
+        <span id="ac-tpl-count" style="color:var(--text);font-weight:600">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Quick Actions</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="nav(document.querySelector('[data-page=finder]'))">🔍 Find New Leads</button>
+      <button class="btn" onclick="nav(document.querySelector('[data-page=templates]'))">✏️ Edit Templates</button>
+      <button class="btn" onclick="nav(document.querySelector('[data-page=settings]'))">⚙️ Settings</button>
+      <button class="btn btn-danger" onclick="if(confirm('Export all data?')) exportData()">📦 Export Data</button>
+    </div>
+  </div>
+</div>
+
+<div id="pg-settings" class="content" style="display:none">
     <div class="settings-section">
       <div class="settings-title">Twilio — SMS Integration</div>
       <div class="settings-desc">Required to send SMS. Sign up free at twilio.com (~$0.008/text)</div>
@@ -661,6 +749,7 @@ select option{background:var(--bg3);color:var(--text)}
   </div>
 </div>
 
+
 <div class="modal-bg" id="m-add-contact"><div class="modal">
   <div class="modal-title">Add Contact</div>
   <div class="grid-2">
@@ -832,6 +921,7 @@ async function incrementUsage(type,amount=1){
   }catch(e){console.warn('incrementUsage:',e);}
 }
 
+
 // ═══════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════
@@ -844,34 +934,6 @@ let pollTimer=null,lastPollTs=0;
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
-function showOnboarding(){
-  document.getElementById('m-onboarding').classList.add('open');
-}
-function obStep1Done(){
-  document.getElementById('ob-step-1').style.display='none';
-  document.getElementById('ob-step-2').style.display='block';
-  // Open settings so they can paste Twilio creds
-  closeM('onboarding');
-  nav(document.querySelector('[data-page=settings]'));
-  toast('Paste your Twilio credentials below and hit Save','info');
-  setTimeout(()=>document.getElementById('m-onboarding').classList.add('open'),100);
-  // After settings save, auto advance
-}
-function obSkip(step){
-  if(step===1){document.getElementById('ob-step-1').style.display='none';document.getElementById('ob-step-2').style.display='block';}
-  else if(step===2){document.getElementById('ob-step-2').style.display='none';document.getElementById('ob-step-3').style.display='block';}
-}
-function obStep2Done(){
-  document.getElementById('ob-step-2').style.display='none';
-  document.getElementById('ob-step-3').style.display='block';
-}
-function finishOnboarding(){
-  localStorage.setItem('norx-onboarded','1');
-  closeM('onboarding');
-  nav(document.querySelector('[data-page=finder]'));
-  toast('Welcome to Norx AI! Start by searching for leads.','success');
-}
-
 async function init(){
   // ── Auth check — redirect to login if not signed in ──
   const token=localStorage.getItem('norx-auth-token');
@@ -922,114 +984,77 @@ async function init(){
   if(!onboarded) showOnboarding();
 }
 
-function showAppLoader(msg){
-  let el=document.getElementById('app-loader');
-  if(!el){
-    el=document.createElement('div');
-    el.id='app-loader';
-    el.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px';
-    el.innerHTML='<div style="width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite"></div><div style="font-size:13px;color:var(--text3);font-family:JetBrains Mono,monospace" id="app-loader-msg">'+msg+'</div>';
-    document.body.appendChild(el);
-  }else{
-    const m=document.getElementById('app-loader-msg');
-    if(m) m.textContent=msg;
-  }
-}
-function hideAppLoader(){
-  const el=document.getElementById('app-loader');
-  if(el) el.remove();
-}
-
-function showUserInfo(){
-  if(!currentUser) return;
-  const meta=JSON.parse(localStorage.getItem('norx-user-meta')||'{}');
-  const name=meta.first_name||currentUser.email?.split('@')[0]||'User';
-  const el=document.getElementById('sidebar-name');
-  if(el) el.textContent=name;
-  const av=document.getElementById('sidebar-avatar');
-  if(av) av.textContent=name[0].toUpperCase();
-  const planEl=document.getElementById('sidebar-plan');
-  if(planEl) planEl.textContent=currentUser.plan||'starter';
-  // Load plan from Supabase profile async
-  getProfile().then(p=>{
-    if(p){
-      currentUser.plan=p.plan||'starter';
-      currentUser.isBeta=p.is_beta||false;
-      if(planEl) planEl.textContent=(p.is_beta?'beta — ':'')+(p.plan||'starter');
-    }
-  });
-}
-
-async function loadDataFromSupabase(){
-  if(!currentUser) return loadData();
-  try{
-    // Load contacts
-    const dbContacts=await sbFetch('contacts?user_id=eq.'+currentUser.id+'&order=created_at.desc&select=*');
-    if(dbContacts&&dbContacts.length>0){
-      contacts=dbContacts.map(r=>({
-        id:r.id,dbId:r.id,
-        name:r.name,industry:r.industry||'',
-        phone:r.phone||'',email:r.email||'',
-        website:r.website||'',status:r.status||'Saved',
-        notes:r.notes||'',callbackNote:r.callback_note||'',
-        smsSent:r.sms_sent||0,lastContact:r.last_contact||'—',
-      }));
-    }else{
-      contacts=JSON.parse(localStorage.getItem('norx-contacts')||'[]');
-    }
-
-    // Load campaigns
-    const dbCamps=await sbFetch('campaigns?user_id=eq.'+currentUser.id+'&order=created_at.desc&select=*');
-    if(dbCamps&&dbCamps.length>0){
-      campaigns=dbCamps.map(r=>({
-        id:r.id,dbId:r.id,name:r.name,target:r.target,
-        template:r.template_name,total:r.total,sent:r.sent,
-        failed:r.failed,cancelled:r.cancelled||0,
-        status:r.status,date:r.campaign_date,
-      }));
-    }else{
-      campaigns=JSON.parse(localStorage.getItem('norx-campaigns')||'[]');
-    }
-
-    // Load templates
-    const dbTpls=await sbFetch('templates?user_id=eq.'+currentUser.id+'&order=created_at.asc&select=*');
-    if(dbTpls&&dbTpls.length>0){
-      templates=dbTpls.map(r=>({id:r.id,dbId:r.id,name:r.name,body:r.body}));
-    }else{
-      templates=JSON.parse(localStorage.getItem('norx-templates')||'[]');
-    }
-
-    // Load stats + convos from localStorage (fast local cache)
-    stats=JSON.parse(localStorage.getItem('norx-stats')||'{"sent":0,"replies":0,"optouts":0}');
-    conversations=JSON.parse(localStorage.getItem('norx-convos')||'{}'  );
-    activityLog=JSON.parse(localStorage.getItem('norx-activity')||'[]');
-    inboxUnread=JSON.parse(localStorage.getItem('norx-unread')||'{}'  );
-
-  }catch(e){
-    console.error('Supabase load failed, using localStorage:',e);
-    loadData();
-  }
-}
-
 function seedContacts(){
-  // Disabled for SaaS — users start with zero contacts
+  contacts=[
+    {id:1,name:'All About Roofing Repair & Installation',industry:'Roofing',phone:'',email:'info@aaroof.net',website:'https://aaroof.net',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:2,name:'South County Roofing',industry:'Roofing',phone:'',email:'customerservice@southcountyroofing.com',website:'https://southcountyroofing.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:3,name:'Canyon Roofing Contractors',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:4,name:'Everereen Roofing Contractor Services Irvine',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:5,name:'Laguna Hills Roofing',industry:'Roofing',phone:'',email:'',website:'https://lagunahills-roofing.company',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:6,name:'Merit Roofing & Waterproofing',industry:'Roofing',phone:'',email:'info@precisionroofingoc.com',website:'https://precisionroofingoc.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:7,name:'OC Custom Roofing',industry:'Roofing',phone:'',email:'',website:'https://occommercialroofing.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:8,name:'Pro Roofing Company Irvine',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:9,name:'Central Roofing Company Irvine',industry:'Roofing',phone:'',email:'',website:'https://centralroof.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:10,name:'Pacific Roofing Systems',industry:'Roofing',phone:'',email:'',website:'https://pacificroofingsystems.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:11,name:'McCormack Roofing',industry:'Roofing',phone:'',email:'info@mccormackroofing.com',website:'https://mccormackroofing.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:12,name:'RESCUE ROOFER Mission Viejo',industry:'Roofing',phone:'',email:'',website:'https://rescueroofer.net',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:13,name:'Infinity Roofing Irvine CA',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:14,name:'Empire West Roofing',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:15,name:'South County Roofing (Lake Forest)',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+  ];
+  saveData();
 }
+
 function seedTemplates(){
   templates=[
     {
       id:1,
-      name:'Opener — edit me',
-      body:'hey is this [Business Name]?\n\n— [Your Name]'
+      name:'1. Cold Opener',
+      body:'hey is this [Business Name]?',
+      type:'opener',
+      stats:{sent:0,replies:0}
     },
     {
       id:2,
-      name:'Follow-Up — edit me',
-      body:"Hey [Business Name], just following up on my last message.\n\nI work with [Industry] businesses and think there could be a good fit — would you be open to a quick 10-min call this week?\n\nReply STOP to opt out."
+      name:'2. Follow-Up (edit to match your offer)',
+      body:"Hey [Business Name], following up on my last message.\n\nI work with [Industry] businesses to help them get more qualified leads — would love to connect if there's a fit.\n\nReply STOP to opt out.",
+      type:'followup',
+      stats:{sent:0,replies:0}
     },
     {
       id:3,
-      name:'Booking Link — edit me',
-      body:"Here\'s a link to grab a time: [Calendly]\n\nLooking forward to it!"
+      name:'3. Second Follow-Up',
+      body:"Hey just circling back one more time — happy to connect whenever the timing is right for [Business Name].\n\nReply STOP to opt out.",
+      type:'followup',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:4,
+      name:'4. Warm Lead Response',
+      body:"Hey [Business Name]! Great to hear from you. I'd love to jump on a quick 10-min call this week to see if I can help — what does your schedule look like?\n\nReply STOP to opt out.",
+      type:'warm',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:5,
+      name:'5. Send Booking Link',
+      body:"Sounds great! Here's a link to grab a time: [Calendly]\n\nLooking forward to it!",
+      type:'booking',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:6,
+      name:'6. Follow Up Later Check-in',
+      body:"Hey [Business Name], just wanted to check back in — is now a better time to connect?\n\nReply STOP to opt out.",
+      type:'followup',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:7,
+      name:'7. Closed Won',
+      body:"Excited to work with you [Business Name]! I'll be in touch shortly with next steps.",
+      type:'closed',
+      stats:{sent:0,replies:0}
     },
   ];
   saveData();
@@ -1039,7 +1064,6 @@ function seedTemplates(){
 // STORAGE
 // ═══════════════════════════════════════════════
 function saveData(){
-  // Always save to localStorage for fast access
   try{
     localStorage.setItem('norx-contacts',JSON.stringify(contacts));
     localStorage.setItem('norx-templates',JSON.stringify(templates));
@@ -1049,90 +1073,6 @@ function saveData(){
     localStorage.setItem('norx-activity',JSON.stringify(activityLog.slice(-100)));
     localStorage.setItem('norx-unread',JSON.stringify(inboxUnread));
   }catch(e){}
-}
-
-// Sync a single contact to Supabase
-async function syncContact(contact){
-  if(!currentUser) return contact;
-  try{
-    const row={
-      user_id:currentUser.id,
-      name:contact.name,industry:contact.industry||'',
-      phone:contact.phone||'',email:contact.email||'',
-      website:contact.website||'',status:contact.status||'Saved',
-      notes:contact.notes||'',callback_note:contact.callbackNote||'',
-      sms_sent:contact.smsSent||0,last_contact:contact.lastContact||null,
-    };
-    if(contact.dbId){
-      await sbFetch('contacts?id=eq.'+contact.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
-    }else{
-      const res=await sbFetch('contacts',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
-      if(res?.[0]?.id) contact.dbId=res[0].id;
-    }
-  }catch(e){console.warn('syncContact:',e);}
-  return contact;
-}
-
-// Sync multiple contacts (bulk) to Supabase
-async function syncAllContacts(){
-  if(!currentUser||!contacts.length) return;
-  const toInsert=contacts.filter(c=>!c.dbId);
-  const toUpdate=contacts.filter(c=>c.dbId);
-  try{
-    if(toInsert.length){
-      const rows=toInsert.map(c=>({
-        user_id:currentUser.id,name:c.name,industry:c.industry||'',
-        phone:c.phone||'',email:c.email||'',website:c.website||'',
-        status:c.status||'Saved',notes:c.notes||'',
-        callback_note:c.callbackNote||'',sms_sent:c.smsSent||0,
-      }));
-      for(let i=0;i<rows.length;i+=50){
-        const res=await sbFetch('contacts',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(rows.slice(i,i+50))});
-        if(res){res.forEach((r,idx)=>{if(contacts[i+idx]) contacts[i+idx].dbId=r.id;});}
-      }
-    }
-    for(const c of toUpdate){
-      await sbFetch('contacts?id=eq.'+c.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({
-        status:c.status,notes:c.notes||'',callback_note:c.callbackNote||'',
-        sms_sent:c.smsSent||0,last_contact:c.lastContact||null,phone:c.phone||'',
-      })});
-    }
-  }catch(e){console.warn('syncAllContacts:',e);}
-}
-
-// Sync a single template
-async function syncTemplate(tpl){
-  if(!currentUser) return tpl;
-  try{
-    const row={user_id:currentUser.id,name:tpl.name,body:tpl.body};
-    if(tpl.dbId){
-      await sbFetch('templates?id=eq.'+tpl.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
-    }else{
-      const res=await sbFetch('templates',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
-      if(res?.[0]?.id) tpl.dbId=res[0].id;
-    }
-  }catch(e){console.warn('syncTemplate:',e);}
-  return tpl;
-}
-
-// Sync campaign to Supabase
-async function syncCampaign(camp){
-  if(!currentUser) return camp;
-  try{
-    const row={
-      user_id:currentUser.id,name:camp.name,target:camp.target,
-      template_name:camp.template,total:camp.total,sent:camp.sent,
-      failed:camp.failed,cancelled:camp.cancelled||0,
-      status:camp.status,campaign_date:camp.date,
-    };
-    if(camp.dbId){
-      await sbFetch('campaigns?id=eq.'+camp.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
-    }else{
-      const res=await sbFetch('campaigns',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
-      if(res?.[0]?.id) camp.dbId=res[0].id;
-    }
-  }catch(e){console.warn('syncCampaign:',e);}
-  return camp;
 }
 function loadData(){
   try{
@@ -1308,6 +1248,13 @@ async function fetchReplies(){
           } else if(contact.status==='Opener Sent'){
             contact.status='Engaged';
             logActivity(`${contact.name} replied → promoted to Engaged`,'warn');
+            // Credit the reply to the last template used
+            const lastOut=(conversations[cid]||[]).filter(m=>m.dir==='out').pop();
+            if(lastOut?.templateId){
+              const t=templates.find(x=>x.id==lastOut.templateId);
+              if(t){if(!t.stats) t.stats={sent:0,replies:0};t.stats.replies=(t.stats.replies||0)+1;}
+              saveData();
+            }
           }else{
             logActivity(`New reply from ${contact.name}`,'accent');
           }
@@ -1433,16 +1380,9 @@ async function runCampaign(name,target,tpl,industry=''){
     return;
   }
 
-  // Check plan limit before launching
-  const campCheck=await checkPlanLimit('campaign');
-  if(!campCheck.ok){toast(campCheck.msg,'error');return;}
-
   campaignCancelled=false;
   const camp={id:Date.now(),name,target,template:tpl.name,total:recipients.length,sent:0,failed:0,cancelled:0,date:new Date().toLocaleDateString(),status:'sending'};
-  campaigns.unshift(camp);
-  syncCampaign(camp);
-  incrementUsage('campaign');
-  saveData();
+  campaigns.unshift(camp);saveData();
   openM('sending');
   const pFill=document.getElementById('send-progress'),pDetail=document.getElementById('send-detail'),pTitle=document.getElementById('send-title'),pSub=document.getElementById('send-sub');
   const cancelBtn=document.getElementById('cancel-camp-btn');
@@ -1482,8 +1422,11 @@ async function runCampaign(name,target,tpl,industry=''){
       conversations[c.id].push({dir:'out',text:msg,time:new Date().toLocaleTimeString(),ts:Date.now(),sid:result.sid||''});
       pDetail.textContent=`${i+1} / ${recipients.length} ✓ ${c.name}`;
       logActivity(`SMS sent to ${c.name}`,'accent');
-      syncContact(c); // update status in Supabase
-      incrementUsage('sms');
+    // Track template performance
+    if(tpl?.id){
+      const t=templates.find(x=>x.id==tpl.id);
+      if(t){if(!t.stats) t.stats={sent:0,replies:0};t.stats.sent=(t.stats.sent||0)+1;}
+    }
     }catch(e){
       camp.failed++;
       pDetail.textContent=`${i+1} / ${recipients.length} ✗ ${c.name}: ${e.message.substring(0,50)}`;
@@ -1567,9 +1510,11 @@ function renderInbox(filterQ=''){
     return (mb[mb.length-1]?.ts||0)-(ma[ma.length-1]?.ts||0);
   });
   const q=(filterQ||'').toLowerCase();
-  const filtered=sorted.filter(cid=>{
-    if(!q) return true;
+  const stageFilter=document.getElementById('inbox-stage-filter')?.value||'';
+   const filtered=sorted.filter(cid=>{
     const c=contacts.find(x=>x.id==cid);
+    if(stageFilter && c?.status !== stageFilter) return false;
+    if(!q) return true;
     return (c?.name||'').toLowerCase().includes(q)||(c?.phone||'').includes(q);
   });
   if(!filtered.length){listEl.innerHTML='<div class="empty" style="padding:28px 14px;font-size:12px">No matches.</div>';return;}
@@ -1632,7 +1577,7 @@ function openConvo(cid){
       <div class="chat-hdr-actions">
         ${statusSel}
         ${calendlyBtn}
-        <button class="btn btn-sm" onclick="openDetail(${cid})">View Contact</button>
+        <button class="btn btn-sm" onclick="openDetail(${cid})">👤 Contact Info</button>
       </div>
     </div>
     <div class="chat-messages" id="chat-msgs">
@@ -1840,7 +1785,7 @@ function renderPipeline(){
     const colors={Cold:'var(--accent)',Warm:'var(--warn)',Hot:'var(--danger)',Booked:'var(--green)',Called:'var(--purple)',Closed:'#00ff9d',Lost:'var(--text3)'};
     return`<div class="pipe-col">
       <div class="pipe-head"><div class="pipe-col-label" style="color:${colors[s]}">${s}</div><div class="pipe-count">${items.length}</div></div>
-      ${items.map(c=>`<div class="pipe-card" onclick="openDetail(${c.id})">
+      ${items.map(c=>`<div class="pipe-card" onclick="openChatFromPipeline(${c.id})">
         <div class="pipe-card-name">${c.name}</div>
         <div class="pipe-card-sub">${c.phone||'no phone'}${c.callbackNote?` · ⏰ ${c.callbackNote}`:''}</div>
       </div>`).join('')||`<div style="font-size:11px;color:var(--text3);text-align:center;padding:14px">Empty</div>`}
@@ -1902,13 +1847,23 @@ function renderCampaigns(){
     </div>`).join('');
 }
 function renderTemplates(){
-  document.getElementById('tpl-list').innerHTML=templates.map(t=>`
+  document.getElementById('tpl-list').innerHTML=templates.map(t=>{
+    const stats=t.stats||{sent:0,replies:0};
+    const replyRate=stats.sent>0?Math.round((stats.replies/stats.sent)*100):null;
+    const rateColor=replyRate>=20?'var(--green)':replyRate>=10?'var(--warn)':'var(--text3)';
+    return `
     <div class="tpl-card">
       <div class="tpl-card-name">${t.name}
         <div style="display:flex;gap:6px"><button class="btn btn-sm" onclick="editTemplate(${t.id})">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteTpl(${t.id})">Delete</button></div>
       </div>
       <div class="tpl-card-body">${escHtml(t.body)}</div>
-    </div>`).join('')||'<div class="empty">No templates yet.</div>';
+      <div style="display:flex;gap:16px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;font-family:'JetBrains Mono',monospace;flex-wrap:wrap">
+        <span style="color:var(--text3)">📤 Sent: <strong style="color:var(--text2)">${stats.sent||0}</strong></span>
+        <span style="color:var(--text3)">💬 Replies: <strong style="color:var(--text2)">${stats.replies||0}</strong></span>
+        <span style="color:var(--text3)">📈 Rate: <strong style="color:${rateColor}">${replyRate!==null?replyRate+'%':'—'}</strong></span>
+      </div>
+    </div>`;
+  }).join('')||'<div class="empty">No templates yet.</div>';
   populateTplSelect('c-tpl');
 }
 function populateTplSelect(id){
@@ -1916,6 +1871,283 @@ function populateTplSelect(id){
   const cur=sel.value;
   sel.innerHTML='<option value="">-- Select template --</option>'+templates.map(t=>`<option value="${t.id}"${t.id==cur?' selected':''}>${t.name}</option>`).join('');
 }
+// Open chat directly from pipeline card
+function openChatFromPipeline(id){
+  // Switch to inbox page
+  const inboxNav = document.querySelector('[data-page=inbox]');
+  nav(inboxNav);
+  // Open the conversation for this contact
+  const cid = id;
+  if(!conversations[cid]) conversations[cid]=[];
+  setTimeout(()=>openConvo(cid),100);
+}
+
+function renderAccountCenter(){
+  // Stats
+  const totalSMS = stats.sent||0;
+  const totalReplies = stats.replies||0;
+  const rate = totalSMS>0?Math.round((totalReplies/totalSMS)*100):null;
+  document.getElementById('ac-total-contacts').textContent = contacts.length;
+  document.getElementById('ac-total-sms').textContent = totalSMS.toLocaleString();
+  document.getElementById('ac-total-replies').textContent = totalReplies.toLocaleString();
+  document.getElementById('ac-reply-rate').textContent = rate!==null?rate+'%':'—';
+
+  // Pipeline breakdown
+  const stages=['Saved','Opener Sent','Engaged','Warm','Hot','Booked','Follow Up Later','Called','Closed','Lost','Opt-Out'];
+  const stageColors={'Warm':'var(--warn)','Hot':'var(--danger)','Booked':'var(--green)','Closed':'var(--accent)','Engaged':'var(--purple,#a78bfa)'};
+  const breakdown = document.getElementById('ac-pipeline-breakdown');
+  breakdown.innerHTML = stages.map(s=>{
+    const count = contacts.filter(c=>c.status===s).length;
+    if(!count) return '';
+    const color = stageColors[s]||'var(--text3)';
+    return `<div style="padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:12px;font-family:'JetBrains Mono',monospace">
+      <span style="color:${color};font-weight:700">${count}</span> <span style="color:var(--text3)">${s}</span>
+    </div>`;
+  }).join('');
+
+  // Template performance
+  const tplPerf = document.getElementById('ac-template-perf');
+  const sorted = [...templates].sort((a,b)=>(b.stats?.sent||0)-(a.stats?.sent||0));
+  tplPerf.innerHTML = sorted.length ? sorted.map(t=>{
+    const s=t.stats||{sent:0,replies:0};
+    const rate=s.sent>0?Math.round((s.replies/s.sent)*100):null;
+    const rateColor=rate>=20?'var(--green)':rate>=10?'var(--warn)':'var(--text3)';
+    const pct=s.sent>0?Math.min(100,Math.round((s.replies/s.sent)*100)):0;
+    return `<div style="padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:12px;font-weight:600;color:var(--text)">${t.name}</span>
+        <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:${rateColor}">${rate!==null?rate+'% reply rate':'No data yet'}</span>
+      </div>
+      <div style="display:flex;gap:12px;font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:6px">
+        <span style="color:var(--text3)">Sent: <strong style="color:var(--text2)">${s.sent}</strong></span>
+        <span style="color:var(--text3)">Replies: <strong style="color:var(--text2)">${s.replies}</strong></span>
+      </div>
+      <div style="height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${rateColor};border-radius:2px;transition:width 0.5s ease"></div>
+      </div>
+    </div>`;
+  }).join('') : '<div style="font-size:13px;color:var(--text3)">Send campaigns to start tracking template performance.</div>';
+
+  // Account info
+  const cfg = getTwilio();
+  document.getElementById('ac-agency-name').textContent = localStorage.getItem('norx-s-agency')||cfg.agency||'Not set';
+  document.getElementById('ac-user-name').textContent = localStorage.getItem('norx-s-name')||'Not set';
+  document.getElementById('ac-twilio-num').textContent = cfg.from||'Not connected';
+  document.getElementById('ac-tpl-count').textContent = templates.length;
+}
+
+function logoutUser(){
+  if(!confirm('Log out of Norx AI?')) return;
+  localStorage.removeItem('norx-auth-token');
+  localStorage.removeItem('norx-user-id');
+  localStorage.removeItem('norx-user-email');
+  localStorage.removeItem('norx-user-plan');
+  localStorage.removeItem('norx-user-meta');
+  window.location.href='/login';
+}
+
+function showUserInfo(){
+  if(!currentUser) return;
+  const meta=JSON.parse(localStorage.getItem('norx-user-meta')||'{}');
+  const name=meta.first_name||currentUser.email?.split('@')[0]||'User';
+  const el=document.getElementById('sidebar-name');
+  if(el) el.textContent=name;
+  const av=document.getElementById('sidebar-avatar');
+  if(av) av.textContent=name[0].toUpperCase();
+  const planEl=document.getElementById('sidebar-plan');
+  if(planEl) planEl.textContent=currentUser.plan||'starter';
+  // Load plan from Supabase profile async
+  getProfile().then(p=>{
+    if(p){
+      currentUser.plan=p.plan||'starter';
+      currentUser.isBeta=p.is_beta||false;
+      if(planEl) planEl.textContent=(p.is_beta?'beta — ':'')+(p.plan||'starter');
+    }
+  });
+}
+
+function loadDataFromSupabase(){
+  if(!currentUser) return loadData();
+  try{
+    // Load contacts
+    const dbContacts=await sbFetch('contacts?user_id=eq.'+currentUser.id+'&order=created_at.desc&select=*');
+    if(dbContacts&&dbContacts.length>0){
+      contacts=dbContacts.map(r=>({
+        id:r.id,dbId:r.id,
+        name:r.name,industry:r.industry||'',
+        phone:r.phone||'',email:r.email||'',
+        website:r.website||'',status:r.status||'Saved',
+        notes:r.notes||'',callbackNote:r.callback_note||'',
+        smsSent:r.sms_sent||0,lastContact:r.last_contact||'—',
+      }));
+    }else{
+      contacts=JSON.parse(localStorage.getItem('norx-contacts')||'[]');
+    }
+
+    // Load campaigns
+    const dbCamps=await sbFetch('campaigns?user_id=eq.'+currentUser.id+'&order=created_at.desc&select=*');
+    if(dbCamps&&dbCamps.length>0){
+      campaigns=dbCamps.map(r=>({
+        id:r.id,dbId:r.id,name:r.name,target:r.target,
+        template:r.template_name,total:r.total,sent:r.sent,
+        failed:r.failed,cancelled:r.cancelled||0,
+        status:r.status,date:r.campaign_date,
+      }));
+    }else{
+      campaigns=JSON.parse(localStorage.getItem('norx-campaigns')||'[]');
+    }
+
+    // Load templates
+    const dbTpls=await sbFetch('templates?user_id=eq.'+currentUser.id+'&order=created_at.asc&select=*');
+    if(dbTpls&&dbTpls.length>0){
+      templates=dbTpls.map(r=>({id:r.id,dbId:r.id,name:r.name,body:r.body}));
+    }else{
+      templates=JSON.parse(localStorage.getItem('norx-templates')||'[]');
+    }
+
+    // Load stats + convos from localStorage (fast local cache)
+    stats=JSON.parse(localStorage.getItem('norx-stats')||'{"sent":0,"replies":0,"optouts":0}');
+    conversations=JSON.parse(localStorage.getItem('norx-convos')||'{}'  );
+    activityLog=JSON.parse(localStorage.getItem('norx-activity')||'[]');
+    inboxUnread=JSON.parse(localStorage.getItem('norx-unread')||'{}'  );
+
+  }catch(e){
+    console.error('Supabase load failed, using localStorage:',e);
+    loadData();
+  }
+}
+
+function showAppLoader(msg){
+  let el=document.getElementById('app-loader');
+  if(!el){
+    el=document.createElement('div');
+    el.id='app-loader';
+    el.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px';
+    el.innerHTML='<div style="width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite"></div><div style="font-size:13px;color:var(--text3);font-family:JetBrains Mono,monospace" id="app-loader-msg">'+msg+'</div>';
+    document.body.appendChild(el);
+  }else{
+    const m=document.getElementById('app-loader-msg');
+    if(m) m.textContent=msg;
+  }
+}
+
+function hideAppLoader(){
+  const el=document.getElementById('app-loader');
+  if(el) el.remove();
+}
+
+function showOnboarding(){
+  document.getElementById('m-onboarding').classList.add('open');
+}
+
+function obStep1Done(){
+  document.getElementById('ob-step-1').style.display='none';
+  document.getElementById('ob-step-2').style.display='block';
+  // Open settings so they can paste Twilio creds
+  closeM('onboarding');
+  nav(document.querySelector('[data-page=settings]'));
+  toast('Paste your Twilio credentials below and hit Save','info');
+  setTimeout(()=>document.getElementById('m-onboarding').classList.add('open'),100);
+  // After settings save, auto advance
+}
+
+function obSkip(step){
+  if(step===1){document.getElementById('ob-step-1').style.display='none';document.getElementById('ob-step-2').style.display='block';}
+  else if(step===2){document.getElementById('ob-step-2').style.display='none';document.getElementById('ob-step-3').style.display='block';}
+}
+
+function obStep2Done(){
+  document.getElementById('ob-step-2').style.display='none';
+  document.getElementById('ob-step-3').style.display='block';
+}
+
+function finishOnboarding(){
+  localStorage.setItem('norx-onboarded','1');
+  closeM('onboarding');
+  nav(document.querySelector('[data-page=finder]'));
+  toast('Welcome to Norx AI! Start by searching for leads.','success');
+}
+
+function syncContact(contact){
+  if(!currentUser) return contact;
+  try{
+    const row={
+      user_id:currentUser.id,
+      name:contact.name,industry:contact.industry||'',
+      phone:contact.phone||'',email:contact.email||'',
+      website:contact.website||'',status:contact.status||'Saved',
+      notes:contact.notes||'',callback_note:contact.callbackNote||'',
+      sms_sent:contact.smsSent||0,last_contact:contact.lastContact||null,
+    };
+    if(contact.dbId){
+      await sbFetch('contacts?id=eq.'+contact.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    }else{
+      const res=await sbFetch('contacts',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
+      if(res?.[0]?.id) contact.dbId=res[0].id;
+    }
+  }catch(e){console.warn('syncContact:',e);}
+  return contact;
+}
+
+function syncAllContacts(){
+  if(!currentUser||!contacts.length) return;
+  const toInsert=contacts.filter(c=>!c.dbId);
+  const toUpdate=contacts.filter(c=>c.dbId);
+  try{
+    if(toInsert.length){
+      const rows=toInsert.map(c=>({
+        user_id:currentUser.id,name:c.name,industry:c.industry||'',
+        phone:c.phone||'',email:c.email||'',website:c.website||'',
+        status:c.status||'Saved',notes:c.notes||'',
+        callback_note:c.callbackNote||'',sms_sent:c.smsSent||0,
+      }));
+      for(let i=0;i<rows.length;i+=50){
+        const res=await sbFetch('contacts',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(rows.slice(i,i+50))});
+        if(res){res.forEach((r,idx)=>{if(contacts[i+idx]) contacts[i+idx].dbId=r.id;});}
+      }
+    }
+    for(const c of toUpdate){
+      await sbFetch('contacts?id=eq.'+c.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({
+        status:c.status,notes:c.notes||'',callback_note:c.callbackNote||'',
+        sms_sent:c.smsSent||0,last_contact:c.lastContact||null,phone:c.phone||'',
+      })});
+    }
+  }catch(e){console.warn('syncAllContacts:',e);}
+}
+
+function syncTemplate(tpl){
+  if(!currentUser) return tpl;
+  try{
+    const row={user_id:currentUser.id,name:tpl.name,body:tpl.body};
+    if(tpl.dbId){
+      await sbFetch('templates?id=eq.'+tpl.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    }else{
+      const res=await sbFetch('templates',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
+      if(res?.[0]?.id) tpl.dbId=res[0].id;
+    }
+  }catch(e){console.warn('syncTemplate:',e);}
+  return tpl;
+}
+
+function syncCampaign(camp){
+  if(!currentUser) return camp;
+  try{
+    const row={
+      user_id:currentUser.id,name:camp.name,target:camp.target,
+      template_name:camp.template,total:camp.total,sent:camp.sent,
+      failed:camp.failed,cancelled:camp.cancelled||0,
+      status:camp.status,campaign_date:camp.date,
+    };
+    if(camp.dbId){
+      await sbFetch('campaigns?id=eq.'+camp.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    }else{
+      const res=await sbFetch('campaigns',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
+      if(res?.[0]?.id) camp.dbId=res[0].id;
+    }
+  }catch(e){console.warn('syncCampaign:',e);}
+  return camp;
+}
+
 function renderAll(){
   renderDash();
   if(currentPage==='analytics') renderAnalytics();
@@ -2000,11 +2232,8 @@ function checkPipelineHealth(){
 function addContact(){
   const name=document.getElementById('n-biz').value.trim();
   if(!name){toast('Business name required.','error');return;}
-  const newC={id:Date.now(),name,industry:document.getElementById('n-ind').value.trim()||'Unknown',phone:document.getElementById('n-phone').value.trim(),email:document.getElementById('n-email').value.trim(),website:document.getElementById('n-web').value.trim(),status:document.getElementById('n-status').value,notes:document.getElementById('n-notes').value.trim(),lastContact:'—',smsSent:0};
-  contacts.unshift(newC);
-  syncContact(newC).then(()=>saveData());
-  incrementUsage('contact');
-  closeM('add-contact');
+  contacts.unshift({id:Date.now(),name,industry:document.getElementById('n-ind').value.trim()||'Unknown',phone:document.getElementById('n-phone').value.trim(),email:document.getElementById('n-email').value.trim(),website:document.getElementById('n-web').value.trim(),status:document.getElementById('n-status').value,notes:document.getElementById('n-notes').value.trim(),lastContact:'—',smsSent:0});
+  saveData();closeM('add-contact');
   ['n-biz','n-ind','n-phone','n-email','n-web','n-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   renderAll();toast('Contact added!','success');
 }
@@ -2016,9 +2245,7 @@ function importContacts(){
     if(p[0]){contacts.push({id:Date.now()+Math.random(),name:p[0],industry:p[1]||'Unknown',phone:p[2]||'',email:p[3]||'',website:p[4]||'',status:'Saved',notes:'',lastContact:'—',smsSent:0});count++;}
   });
   saveData();closeM('import');document.getElementById('import-txt').value='';renderAll();
-  toast(`Imported ${count} contacts. Syncing to database...`,'success');
-  syncAllContacts().then(()=>{saveData();toast(`${count} contacts synced!`,'success');});
-  incrementUsage('contact',count);
+  toast(`Imported ${count} contacts.`,'success');
 }
 function setStatus(id,val){
   const c=contacts.find(x=>x.id===id||x.id==id);if(!c) return;
@@ -2093,15 +2320,8 @@ function saveNotes(id){const c=contacts.find(x=>x.id===id);if(c){c.notes=documen
 function saveTemplate(){
   const name=document.getElementById('t-name').value.trim(),body=document.getElementById('t-body').value.trim();
   if(!name||!body){toast('Name and message required.','error');return;}
-  if(editTplId){
-    const t=templates.find(x=>x.id===editTplId);
-    if(t){t.name=name;t.body=body;syncTemplate(t);}
-    editTplId=null;
-  }else{
-    const newT={id:Date.now(),name,body};
-    templates.push(newT);
-    syncTemplate(newT);
-  }
+  if(editTplId){const t=templates.find(x=>x.id===editTplId);if(t){t.name=name;t.body=body;}editTplId=null;}
+  else templates.push({id:Date.now(),name,body});
   saveData();closeM('new-template');
   document.getElementById('t-name').value='';document.getElementById('t-body').value='';
   document.getElementById('tpl-modal-title').textContent='New Template';
@@ -2170,10 +2390,6 @@ async function searchLeads(){
   const gkey=getGKey();
   if(!niche||!loc){toast('Enter a niche and location.','error');return;}
   if(!gkey){document.getElementById('finder-api-warn').style.display='block';toast('Add your Google Places API key in Settings.','error');return;}
-  // Check search limit
-  const searchCheck=await checkPlanLimit('search');
-  if(!searchCheck.ok){toast(searchCheck.msg,'error');return;}
-  incrementUsage('search');
   document.getElementById('finder-api-warn').style.display='none';
   document.getElementById('finder-results').style.display='block';
   document.getElementById('leads-body').innerHTML=`<div class="finder-loading"><div class="spinner"></div><div>Finding <strong style="color:var(--text)">${niche}</strong> near <strong style="color:var(--text)">${loc}</strong></div><div class="finder-progress" id="finder-prog">Geocoding location...</div></div>`;
@@ -2245,10 +2461,7 @@ function toggleLeads(cb){document.querySelectorAll('.lead-chk').forEach(c=>c.che
 function getSelectedLeads(){return[...document.querySelectorAll('.lead-chk:checked')].map(el=>finderResults[+el.dataset.i]).filter(Boolean);}
 function addLeadToContacts(r){
   if(contacts.find(c=>c.name===r.name)) return false;
-  const newLead={id:Date.now()+Math.random(),name:r.name,industry:r.industry,phone:r.phone,email:'',website:r.website,status:'Saved',notes:`Rating: ${r.rating} · ${r.reviews} reviews · ${r.address}`,lastContact:'—',smsSent:0};
-  contacts.unshift(newLead);
-  syncContact(newLead);
-  incrementUsage('contact');
+  contacts.unshift({id:Date.now()+Math.random(),name:r.name,industry:r.industry,phone:r.phone,email:'',website:r.website,status:'Saved',notes:`Rating: ${r.rating} · ${r.reviews} reviews · ${r.address}`,lastContact:'—',smsSent:0});
   return true;
 }
 function addSingleLead(i){const r=finderResults[i];if(!r) return;if(addLeadToContacts(r)){saveData();renderAll();toast(`${r.name} added.`,'success');}else toast(`${r.name} already exists.`,'info');}
@@ -2318,16 +2531,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 // ═══════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════
-function logoutUser(){
-  if(!confirm('Log out of Norx AI?')) return;
-  localStorage.removeItem('norx-auth-token');
-  localStorage.removeItem('norx-user-id');
-  localStorage.removeItem('norx-user-email');
-  localStorage.removeItem('norx-user-plan');
-  localStorage.removeItem('norx-user-meta');
-  window.location.href='/login';
-}
-
 function toast(msg,type='info'){
   const el=document.createElement('div');
   el.className=`toast toast-${type}`;
