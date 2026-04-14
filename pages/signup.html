@@ -92,7 +92,7 @@ input::placeholder{color:var(--text3)}
           <div class="plan-option-top">
             <div class="plan-name">Starter</div>
           </div>
-          <div class="plan-price">$49<span>/month</span></div>
+          <div class="plan-price" id="price-starter">$49<span>/month</span></div>
           <div class="plan-limits" style="margin-top:6px">500 contacts · 1,000 SMS/mo<br>5 Lead Finder searches · 3 campaigns</div>
         </div>
         <div class="plan-radio"></div>
@@ -106,7 +106,7 @@ input::placeholder{color:var(--text3)}
           <div class="plan-option-top">
             <div class="plan-name">Pro</div>
           </div>
-          <div class="plan-price">$97<span>/month</span></div>
+          <div class="plan-price" id="price-pro">$97<span>/month</span></div>
           <div class="plan-limits" style="margin-top:6px">2,500 contacts · 5,000 SMS/mo<br>20 Lead Finder searches · 10 campaigns</div>
         </div>
         <div class="plan-radio"></div>
@@ -203,13 +203,30 @@ const PRICE_IDS = {
   agency: 'price_1TKaqBDu5ohsJk2nzcbpUDwN',
 };
 const BETA_CODES = {
-  'NORX-BETA-2026': { plan: 'agency', label: 'Agency (Beta)' },
-  'NORXFRIEND1': { plan: 'pro', label: 'Pro (Beta)' },
-  'NORXFRIEND2': { plan: 'pro', label: 'Pro (Beta)' },
-  'NORXFRIEND3': { plan: 'pro', label: 'Pro (Beta)' },
-  'NORXFRIEND4': { plan: 'pro', label: 'Pro (Beta)' },
-  'NORXFRIEND5': { plan: 'pro', label: 'Pro (Beta)' },
+  'NORX-BETA-2026': { plan: 'agency', label: 'Agency (Beta)', free: true },
+  'NORXFRIEND1': { plan: 'pro', label: 'Pro (Beta)', free: true },
+  'NORXFRIEND2': { plan: 'pro', label: 'Pro (Beta)', free: true },
+  'NORXFRIEND3': { plan: 'pro', label: 'Pro (Beta)', free: true },
+  'NORXFRIEND4': { plan: 'pro', label: 'Pro (Beta)', free: true },
+  'NORXFRIEND5': { plan: 'pro', label: 'Pro (Beta)', free: true },
 };
+
+// Founder codes — 50% off for life on Starter or Pro only
+const FOUNDER_CODES = {
+  'NORXFOUNDER1': { discount: 0.5, label: '50% off — Founder pricing' },
+  'NORXFOUNDER2': { discount: 0.5, label: '50% off — Founder pricing' },
+  'NORXFOUNDER3': { discount: 0.5, label: '50% off — Founder pricing' },
+  'NORXFOUNDER4': { discount: 0.5, label: '50% off — Founder pricing' },
+  'NORXFOUNDER5': { discount: 0.5, label: '50% off — Founder pricing' },
+  'NORXFOUNDER6': { discount: 0.5, label: '50% off — Founder pricing' },
+  'NORXFOUNDER7': { discount: 0.5, label: '50% off — Founder pricing' },
+  'NORXFOUNDER8': { discount: 0.5, label: '50% off — Founder pricing' },
+  'NORXFOUNDER9': { discount: 0.5, label: '50% off — Founder pricing' },
+  'NORXFOUNDER10': { discount: 0.5, label: '50% off — Founder pricing' },
+};
+
+let founderCodeApplied = false;
+let founderDiscount = 0;
 
 let selectedPlan = 'pro';
 let betaCodeApplied = false;
@@ -251,12 +268,38 @@ function applyBetaCode() {
   const msgEl = document.getElementById('beta-code-msg');
   const btn = document.getElementById('beta-apply-btn');
   if (!code) { msgEl.textContent = 'Enter a code first.'; msgEl.style.color = 'var(--danger)'; msgEl.style.display = 'block'; return; }
+
+  // Check founder code first
+  const founder = FOUNDER_CODES[code];
+  if (founder) {
+    // Only valid on Starter or Pro — not Agency
+    if (selectedPlan === 'agency') {
+      msgEl.textContent = '✕ Founder pricing is not available on the Agency plan.';
+      msgEl.style.color = 'var(--danger)';
+      msgEl.style.display = 'block';
+      return;
+    }
+    founderCodeApplied = true;
+    founderDiscount = founder.discount;
+    betaCodeApplied = false;
+    // Update price display
+    updateFounderPricing();
+    msgEl.textContent = '🎉 ' + founder.label + ' — locked in forever!';
+    msgEl.style.color = 'var(--green)';
+    msgEl.style.display = 'block';
+    btn.textContent = '✓ Applied';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'rgba(0,229,160,0.3)';
+    return;
+  }
+
   const match = BETA_CODES[code];
   if (!match) {
     msgEl.textContent = '✕ Invalid code.';
     msgEl.style.color = 'var(--danger)';
     msgEl.style.display = 'block';
     betaCodeApplied = false;
+    founderCodeApplied = false;
     return;
   }
   betaCodeApplied = true;
@@ -274,6 +317,47 @@ function applyBetaCode() {
   document.getElementById('card-element').closest('.form-group').style.display = 'none';
   document.getElementById('submit-btn').querySelector('#btn-text').textContent = 'Create beta account →';
   document.querySelectorAll('.plan-option').forEach(p => { p.style.opacity = p.dataset.plan === match.plan ? '1' : '0.4'; p.style.pointerEvents = 'none'; });
+}
+
+function updateFounderPricing() {
+  if (!founderCodeApplied) return;
+  const prices = { starter: 49, pro: 97 };
+  const original = prices[selectedPlan];
+  if (!original) return;
+  const discounted = (original * (1 - founderDiscount)).toFixed(2);
+  // Update the price display on the selected plan card
+  const planEl = document.querySelector(`[data-plan="${selectedPlan}"] .plan-price`);
+  if (planEl) {
+    planEl.innerHTML = `<span style="text-decoration:line-through;color:var(--text3);font-size:16px">$${original}</span> $${discounted}<span>/month</span>`;
+  }
+  // Add founder badge
+  const badge = document.querySelector(`[data-plan="${selectedPlan}"] .plan-badge`);
+  if (badge) {
+    badge.textContent = '🎉 Founder Price';
+    badge.style.background = 'var(--green)';
+  }
+  // Update button text
+  const btnText = document.getElementById('btn-text');
+  if (btnText) btnText.textContent = `Start free trial — $${discounted}/mo after →`;
+}
+
+// Override selectPlan to update founder pricing if code applied
+const _origSelectPlan = selectPlan;
+function selectPlan(el) {
+  _origSelectPlan(el);
+  if (founderCodeApplied) {
+    // Check if Agency selected — remove founder discount
+    if (el.dataset.plan === 'agency') {
+      founderCodeApplied = false;
+      founderDiscount = 0;
+      document.getElementById('beta-code-msg').textContent = '✕ Founder pricing not available on Agency plan. Code removed.';
+      document.getElementById('beta-code-msg').style.color = 'var(--danger)';
+      document.getElementById('beta-apply-btn').textContent = 'Apply';
+      document.getElementById('beta-apply-btn').style.color = '';
+    } else {
+      updateFounderPricing();
+    }
+  }
 }
 
 // Main signup handler
@@ -373,7 +457,16 @@ async function handleSignup() {
       const subResp = await fetch(SUPABASE_URL + '/functions/v1/create-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
-        body: JSON.stringify({ payment_method_id: paymentMethod.id, plan: selectedPlan, price_id: PRICE_IDS[selectedPlan], email, name: firstName + ' ' + lastName, agency_name: agencyName, user_id: userId }),
+        body: JSON.stringify({
+          payment_method_id: paymentMethod.id,
+          plan: selectedPlan,
+          price_id: PRICE_IDS[selectedPlan],
+          email, name: firstName + ' ' + lastName,
+          agency_name: agencyName,
+          user_id: userId,
+          founder_discount: founderCodeApplied ? founderDiscount : 0,
+          founder_code: founderCodeApplied ? document.getElementById('beta-code').value.trim().toUpperCase() : null,
+        }),
       });
       const subData = await subResp.json();
       if (subData.error) { showError(subData.error); resetBtn(); return; }
