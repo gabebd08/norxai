@@ -2267,7 +2267,13 @@ function clRender(){
   const stage = document.getElementById('cl-stage')?.value||'';
   const cs = document.getElementById('cl-callstatus')?.value||'';
 
-  // Read contacts directly from the global contacts array
+  // Read from global contacts array, fallback to localStorage
+  if(!contacts || contacts.length === 0){
+    try{
+      const stored = localStorage.getItem('norx-contacts');
+      if(stored) contacts = JSON.parse(stored);
+    }catch(e){}
+  }
   let list2 = contacts.filter(c=>{
     if(ind && c.industry!==ind) return false;
     if(stage && c.status!==stage) return false;
