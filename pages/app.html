@@ -2543,7 +2543,7 @@ function updateCampPreview(){
   const sample=contacts.find(c=>c.status!=='Opt-Out')||contacts[0];
   const el=document.getElementById('c-preview');
   if(!tpl||!sample){el.textContent='Select a template above';return;}
-  el.textContent=buildMessage(tpl.body,sample);updateCampCount();
+  el.textContent=buildMessage(tpl.body,sample);
 }
 
 // ═══════════════════════════════════════════════
