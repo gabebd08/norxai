@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Norx AI — Agency Outreach Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080a0e;--bg2:#0d1017;--bg3:#131720;--bg4:#1a2030;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--border3:rgba(255,255,255,0.18);--text:#eef0f4;--text2:#7c8494;--text3:#3d4556;--accent:#00d4ff;--accent-dim:rgba(0,212,255,0.08);--accent-border:rgba(0,212,255,0.2);--green:#00e5a0;--green-dim:rgba(0,229,160,0.08);--warn:#ffb347;--warn-dim:rgba(255,179,71,0.08);--danger:#ff5f5f;--danger-dim:rgba(255,95,95,0.08);--purple:#a78bfa;--r:8px;--r-lg:12px;--r-xl:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.mono{font-family:'JetBrains Mono',monospace}
+.app{display:flex;height:100vh}
+.sidebar{width:230px;min-width:230px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.logo-wrap{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-text{font-size:18px;font-weight:700;letter-spacing:-0.5px}
+.logo-text span{color:var(--accent)}
+.logo-tag{font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px}
+.nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-sec{font-size:9px;font-weight:600;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;padding:0 10px;margin:14px 0 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.15s;border:1px solid transparent;user-select:none;position:relative}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-border)}
+.nav-icon{width:15px;height:15px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--accent);color:var(--bg);font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
+.nav-badge-new{background:var(--green)!important;color:var(--bg)!important}
+.nav-badge-red{background:var(--danger)!important;color:#fff!important}
+.sidebar-bottom{padding:12px 10px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--bg);flex-shrink:0}
+.topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;gap:12px}
+.page-title{font-size:15px;font-weight:700;letter-spacing:-0.3px;white-space:nowrap}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;background:var(--bg3);padding:4px 10px;border-radius:20px;border:1px solid var(--border);white-space:nowrap}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.btn{padding:7px 14px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:'Syne',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.btn:hover{border-color:var(--border3);color:var(--text);background:var(--bg4)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:600}
+.btn-primary:hover{background:#00b8db;border-color:#00b8db;color:var(--bg)}
+.btn-success{background:var(--green-dim);color:var(--green);border-color:rgba(0,229,160,0.25)}
+.btn-danger{background:var(--danger-dim);color:var(--danger);border-color:rgba(255,95,95,0.25)}
+.btn-warn{background:var(--warn-dim);color:var(--warn);border-color:rgba(255,179,71,0.25)}
+.btn-purple{background:rgba(167,139,250,0.1);color:var(--purple);border-color:rgba(167,139,250,0.25)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.content{flex:1;overflow-y:auto;padding:20px}
+.content-flush{flex:1;overflow:hidden;padding:0}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+/* STATS */
+.stats-grid{display:grid;gap:10px;margin-bottom:18px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;transition:border-color 0.15s}
+.stat:hover{border-color:var(--border2)}
+.stat-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.stat-val{font-size:24px;font-weight:700;letter-spacing:-1px}
+.stat-sub{font-size:10px;color:var(--text3);margin-top:3px;font-family:'JetBrains Mono',monospace}
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
+.card-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2)}
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:8px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);border-bottom:1px solid var(--border);background:var(--bg3);letter-spacing:0.8px;text-transform:uppercase;white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.015);cursor:pointer}
+td.primary{color:var(--text);font-weight:500}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;display:inline-block;flex-shrink:0}
+.b-cold{background:rgba(0,212,255,0.1);color:var(--accent)}.b-cold::before{background:var(--accent)}
+.b-warm{background:var(--warn-dim);color:var(--warn)}.b-warm::before{background:var(--warn)}
+.b-hot{background:var(--danger-dim);color:var(--danger)}.b-hot::before{background:var(--danger)}
+.b-booked{background:var(--green-dim);color:var(--green)}.b-booked::before{background:var(--green)}
+.b-called{background:rgba(167,139,250,0.1);color:var(--purple)}.b-called::before{background:var(--purple)}
+.b-closed{background:rgba(0,229,160,0.2);color:#00ff9d}.b-closed::before{background:#00ff9d}
+.b-lost{background:rgba(255,255,255,0.05);color:var(--text3)}.b-lost::before{background:var(--text3)}
+.b-saved{background:rgba(255,255,255,0.05);color:var(--text3)}.b-saved::before{background:var(--text3)}
+.b-openersent{background:rgba(0,212,255,0.08);color:#5bc8e0}.b-openersent::before{background:#5bc8e0}
+.b-engaged{background:rgba(255,179,71,0.1);color:var(--warn)}.b-engaged::before{background:var(--warn)}
+.b-warm{background:var(--warn-dim);color:var(--warn)}.b-warm::before{background:var(--warn)}
+.b-hot{background:var(--danger-dim);color:var(--danger)}.b-hot::before{background:var(--danger)}
+.b-booked{background:var(--green-dim);color:var(--green)}.b-booked::before{background:var(--green)}
+.b-followuplater{background:rgba(167,139,250,0.12);color:var(--purple)}.b-followuplater::before{background:var(--purple)}
+.b-called{background:rgba(167,139,250,0.08);color:var(--purple)}.b-called::before{background:var(--purple)}
+.b-closed{background:rgba(0,255,157,0.1);color:#00ff9d}.b-closed::before{background:#00ff9d}
+.b-lost{background:rgba(255,255,255,0.04);color:var(--text3)}.b-lost::before{background:var(--text3)}
+.b-optout{background:rgba(255,255,255,0.04);color:var(--text3)}.b-optout::before{background:var(--text3)}
+/* PIPELINE */
+.pipeline{display:flex;gap:10px;overflow-x:auto;align-items:flex-start;padding-bottom:8px;min-height:calc(100vh - 120px)}
+.pipeline::-webkit-scrollbar{height:5px}
+.pipeline::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.pipe-col{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 10px;min-height:calc(100vh - 140px);min-width:220px;flex-shrink:0}
+.pipe-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pipe-col-label{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.pipe-count{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);background:var(--bg3);padding:1px 6px;border-radius:20px;border:1px solid var(--border)}
+.pipe-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;margin-bottom:6px;cursor:pointer;transition:all 0.15s}
+.pipe-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.pipe-card-name{font-size:11px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:2px}
+.pipe-card-sub{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+/* FORMS */
+.form-group{margin-bottom:13px}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px}
+.form-hint{font-size:11px;color:var(--text3);margin-top:3px;font-family:'JetBrains Mono',monospace}
+input,select,textarea{width:100%;padding:8px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Syne',sans-serif;font-size:13px;transition:border-color 0.15s;outline:none;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+textarea{resize:vertical;min-height:72px;line-height:1.6}
+select option{background:var(--bg3);color:var(--text)}
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-xl);padding:24px;width:520px;max-width:96vw;max-height:92vh;overflow-y:auto;animation:fadeUp 0.2s ease}
+.modal-lg{width:680px}
+.modal-xl{width:860px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-size:16px;font-weight:700;letter-spacing:-0.3px;margin-bottom:18px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+/* ALERTS */
+.alert{padding:10px 13px;border-radius:var(--r);font-size:12px;line-height:1.7;margin-bottom:13px}
+.alert-info{background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent)}
+.alert-warn{background:var(--warn-dim);border:1px solid rgba(255,179,71,0.25);color:var(--warn)}
+.alert-success{background:var(--green-dim);border:1px solid rgba(0,229,160,0.25);color:var(--green)}
+.alert-danger{background:var(--danger-dim);border:1px solid rgba(255,95,95,0.25);color:var(--danger)}
+/* TEMPLATES */
+.tpl-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:10px}
+.tpl-card-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.tpl-card-body{font-size:12px;color:var(--text2);line-height:1.7;font-family:'JetBrains Mono',monospace;white-space:pre-wrap}
+.tag{display:inline-block;background:var(--accent-dim);color:var(--accent);font-size:10px;padding:2px 6px;border-radius:5px;font-family:'JetBrains Mono',monospace;border:1px solid var(--accent-border);margin:2px}
+/* PROGRESS */
+.progress-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin:6px 0}
+.progress-fill{height:100%;border-radius:2px;transition:width 0.5s ease}
+/* CAMPAIGNS */
+.camp-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:10px}
+/* SEARCH ROW */
+.search-row{display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
+.section-hdr-title{font-size:13px;font-weight:700}
+/* SETTINGS */
+.settings-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;max-width:580px;margin-bottom:14px}
+.settings-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.settings-desc{font-size:11px;color:var(--text3);margin-bottom:16px;font-family:'JetBrains Mono',monospace}
+/* TOAST */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-lg);padding:11px 14px;font-size:13px;display:flex;align-items:center;gap:10px;animation:fadeUp 0.25s ease;min-width:240px;max-width:360px}
+.toast-success{border-color:rgba(0,229,160,0.3);color:var(--green)}
+.toast-error{border-color:rgba(255,95,95,0.3);color:var(--danger)}
+.toast-info{border-color:var(--accent-border);color:var(--accent)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:0 13px}
+.empty{text-align:center;padding:48px 20px;color:var(--text3);font-size:13px;line-height:2}
+/* LEAD FINDER */
+.finder-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+.finder-bar .form-group{margin:0;flex:1;min-width:140px}
+.finder-results{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.finder-toolbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.finder-count{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.lead-header,.lead-row{display:grid;grid-template-columns:32px 1fr 150px 160px 70px 80px 80px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border)}
+.lead-header{background:var(--bg3);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px}
+.lead-row:hover{background:rgba(255,255,255,0.02)}
+.lead-row:last-child{border-bottom:none}
+.lead-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.lead-addr{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.lead-phone{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text2)}
+.lead-site{font-size:11px;color:var(--accent);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.stars{color:var(--warn);font-size:11px;font-family:'JetBrains Mono',monospace}
+.finder-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;color:var(--text3);font-size:13px;gap:12px}
+.spinner{width:22px;height:22px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.finder-progress{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);text-align:center}
+/* INBOX */
+.inbox-wrap{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 56px);overflow:hidden}
+.inbox-sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
+.inbox-sidebar-hdr{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.inbox-sidebar-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2)}
+.inbox-search-wrap{padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.inbox-search-wrap input{font-size:12px;padding:6px 10px}
+.convo-list{flex:1;overflow-y:auto}
+.convo-item{padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s;position:relative}
+.convo-item:hover{background:var(--bg3)}
+.convo-item.active{background:var(--accent-dim);border-left:2px solid var(--accent)}
+.convo-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.convo-name{font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
+.convo-time{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.convo-preview{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px}
+.convo-unread{width:7px;height:7px;border-radius:50%;background:var(--accent);position:absolute;right:10px;top:50%;transform:translateY(-50%)}
+/* CHAT PANEL */
+.chat-panel{display:flex;flex-direction:column;height:100%;overflow:hidden;background:var(--bg)}
+.chat-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px;flex-direction:column;gap:8px}
+.chat-hdr{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg2)}
+.chat-hdr-info{display:flex;align-items:center;gap:10px}
+.chat-hdr-name{font-size:14px;font-weight:700;color:var(--text)}
+.chat-hdr-phone{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.chat-hdr-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chat-messages{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.bubble-wrap{display:flex;flex-direction:column;max-width:70%}
+.bubble-wrap-out{align-self:flex-end;align-items:flex-end}
+.bubble-wrap-in{align-self:flex-start;align-items:flex-start}
+.bubble{padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.6;word-break:break-word}
+.bubble-out{background:var(--accent);color:var(--bg);font-weight:500;border-bottom-right-radius:3px}
+.bubble-in{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:3px}
+.bubble-time{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;padding:2px 3px}
+.chat-footer{flex-shrink:0;border-top:1px solid var(--border);background:var(--bg2)}
+.quick-replies{display:flex;gap:6px;padding:7px 12px;border-bottom:1px solid var(--border);overflow-x:auto;flex-wrap:nowrap}
+.quick-replies::-webkit-scrollbar{height:3px}
+.qr-chip{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all 0.12s;font-family:'Syne',sans-serif;flex-shrink:0}
+.qr-chip:hover{border-color:var(--accent);color:var(--accent)}
+.chat-compose{display:flex;gap:8px;padding:9px 12px;align-items:flex-end}
+.chat-compose textarea{flex:1;min-height:38px;max-height:100px;resize:none;font-size:13px;line-height:1.5}
+/* ANALYTICS */
+.analytics-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.funnel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.analytics-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px}
+.analytics-card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:12px}
+.funnel-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.funnel-row:last-child{border-bottom:none}
+.funnel-row-label{font-size:12px;color:var(--text2);width:80px;flex-shrink:0}
+.funnel-bar-bg{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.funnel-bar-fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+.funnel-row-val{font-size:12px;font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace;width:40px;text-align:right;flex-shrink:0}
+.funnel-row-pct{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;width:36px;text-align:right;flex-shrink:0}
+.activity-row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.activity-row:last-child{border-bottom:none}
+.activity-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.activity-text{color:var(--text2);flex:1;line-height:1.4}
+.activity-time{color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:10px;flex-shrink:0}
+/* CALENDAR */
+.cal-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:calc(100vh - 100px)}
+.cal-embed{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column}
+.cal-embed-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cal-embed-title{font-size:13px;font-weight:700;color:var(--text)}
+.cal-iframe-wrap{flex:1;overflow:hidden}
+.cal-iframe-wrap iframe{width:100%;height:100%;border:none;background:white}
+.cal-not-set{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;padding:24px;text-align:center;color:var(--text3);font-size:13px;line-height:1.8}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(255,95,95,0.5)}50%{box-shadow:0 0 0 6px rgba(255,95,95,0)}}
+@keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:0.6}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo-wrap">
+    <div class="logo">
+      <div class="logo-mark"><svg viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#080a0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div>
+        <div class="logo-text">Norx<span> AI</span></div>
+        <div class="logo-tag">Agency Outreach Platform</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-sec">Overview</div>
+    <div class="nav-item active" data-page="dashboard" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" data-page="analytics" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><polyline points="1,12 5,7 9,9 15,3" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Analytics
+    </div>
+    <div class="nav-item" data-page="contacts" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" fill="currentColor"/><path d="M1 14c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      Contacts <span class="nav-badge" id="badge-contacts">0</span>
+    </div>
+    <div class="nav-item" data-page="pipeline" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="5" width="3" height="7" rx="1" fill="currentColor"/><rect x="6" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="11" y="7" width="3" height="5" rx="1" fill="currentColor"/></svg>
+      Pipeline
+    </div>
+    <div class="nav-sec">Outreach</div>
+    <div class="nav-item" data-page="inbox" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M2 3l6 5.5L14 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Inbox <span class="nav-badge nav-badge-red" id="badge-inbox" style="display:none">0</span>
+    </div>
+<div class="nav-item" data-page="calllist" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 2h2.5l1 3-1.5 1a8 8 0 004 4l1-1.5 3 1V13a1 1 0 01-1 1C6 14 2 10 2 4a1 1 0 011-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      Call List
+    </div>
+    <div class="nav-item" data-page="finder" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Lead Finder <span class="nav-badge nav-badge-new">v2</span>
+    </div>
+    <div class="nav-item" data-page="campaigns" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M14 2L2 6.5l5 2L14 2z" fill="currentColor"/><path d="M7 8.5l2 5 1.5-3.5" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Campaigns <span class="nav-badge" id="badge-campaigns" style="display:none">0</span>
+    </div>
+    <div class="nav-item" data-page="templates" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="5" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="5" y1="9.5" x2="8.5" y2="9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Templates
+    </div>
+    <div class="nav-sec">Schedule</div>
+    <div class="nav-item" data-page="calendar" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="12" rx="1.5" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="5" y1="1" x2="5" y2="5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="7" x2="15" y2="7" stroke="currentColor" stroke-width="1.2"/></svg>
+      Calendar
+    </div>
+    <div class="nav-sec">System</div>
+    <div class="nav-item" data-page="settings" onclick="nav(this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Settings
+    </div>
+    <div class="nav-item" data-page="account-center" onclick="nav(this);renderAccountCenter()">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M1 14c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      My Account
+    </div>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card" style="cursor:pointer" onclick="window.location.href='/account'">
+      <div class="avatar" id="sidebar-avatar">G</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="sidebar-name">Loading...</div>
+        <div style="font-size:10px;color:var(--accent);font-family:'JetBrains Mono',monospace" id="sidebar-plan">starter</div>
+      </div>
+      <button onclick="event.stopPropagation();logoutUser()" title="Log out" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;font-size:16px;line-height:1">⏻</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0">
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="status-pill"><span class="status-dot" id="twilio-dot" style="background:var(--text3)"></span><span id="twilio-txt">Twilio not configured</span></div>
+      <div class="status-pill" id="maps-pill" style="display:none"><span class="status-dot" style="background:var(--green);animation:pulse 2s infinite"></span><span>Places API ready</span></div>
+      <div class="status-pill" id="poll-pill" style="display:none"><span class="status-dot" style="background:var(--purple);animation:pulse 2s infinite"></span><span id="poll-txt">Polling replies...</span></div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-sm" onclick="pollRepliesNow()" title="Check for new replies now">↻ Sync</button>
+      <button class="btn btn-sm" onclick="openM('import')">Import CSV</button>
+      <button class="btn btn-sm" onclick="openM('add-contact')">+ Contact</button>
+      <button class="btn btn-primary btn-sm" onclick="openM('new-campaign')">Launch Campaign</button>
+    </div>
+  </div>
+
+  <!-- PAGES -->
+  <div id="pg-dashboard" class="content">
+    <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stat"><div class="stat-label">Total Contacts</div><div class="stat-val" style="color:var(--accent)" id="s-total">0</div><div class="stat-sub">leads in system</div></div>
+      <div class="stat"><div class="stat-label">SMS Sent</div><div class="stat-val" id="s-sent">0</div><div class="stat-sub">all time</div></div>
+      <div class="stat"><div class="stat-label">Reply Rate</div><div class="stat-val" style="color:var(--green)" id="s-reply-rate">0%</div><div class="stat-sub" id="s-reply-sub">0 replies received</div></div>
+      <div class="stat"><div class="stat-label">Hot / Booked</div><div class="stat-val" style="color:var(--warn)" id="s-hot">0</div><div class="stat-sub" id="s-closed-sub">0 closed deals</div></div>
+      <div class="stat"><div class="stat-label">Opt-Outs</div><div class="stat-val" id="s-optout">0</div><div class="stat-sub">removed from list</div></div>
+    </div>
+    <div class="section-hdr"><div class="section-hdr-title">Recent leads</div><button class="btn btn-sm" onclick="nav(document.querySelector('[data-page=contacts]'))">View all</button></div>
+    <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>Business</th><th>Industry</th><th>Phone</th><th>Status</th><th>Last Contacted</th></tr></thead><tbody id="dash-tbody"></tbody></table></div></div>
+  </div>
+
+  <div id="pg-analytics" class="content" style="display:none">
+    <div class="analytics-stats" id="anal-stats"></div>
+    <div class="funnel-grid">
+      <div class="analytics-card"><div class="analytics-card-title">Conversion Funnel</div><div id="funnel-rows"></div></div>
+      <div class="analytics-card"><div class="analytics-card-title">Recent Activity</div><div id="activity-feed"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="analytics-card"><div class="analytics-card-title">Campaign Performance</div><div id="camp-perf-rows"></div></div>
+      <div class="analytics-card"><div class="analytics-card-title">Latest Replies</div><div id="latest-reply-rows"></div></div>
+    </div>
+  </div>
+
+  <div id="pg-contacts" class="content" style="display:none">
+    <div class="search-row">
+      <input type="text" id="q" placeholder="Search..." oninput="renderContacts()" style="max-width:220px">
+      <select id="f-status" onchange="renderContacts()" style="width:auto"><option value="">All statuses</option><option>Saved</option><option>Opener Sent</option><option>Engaged</option><option>Warm</option><option>Hot</option><option>Booked</option><option>Follow Up Later</option><option>Called</option><option>Closed</option><option>Lost</option><option>Opt-Out</option></select>
+      <select id="f-industry" onchange="renderContacts()" style="width:auto"><option value="">All industries</option></select>
+      <button class="btn btn-sm btn-danger" onclick="bulkDelete()" style="margin-left:auto">Delete selected</button>
+      <button class="btn btn-sm" onclick="exportCSV()">Export CSV</button>
+    </div>
+    <div class="card"><div style="overflow-x:auto"><table><thead><tr><th><input type="checkbox" id="chk-all" onchange="toggleAll(this)"></th><th>Business</th><th>Industry</th><th>Phone</th><th>Status</th><th>Callback</th><th>SMS Sent</th><th></th></tr></thead><tbody id="c-tbody"></tbody></table></div></div>
+  </div>
+
+  <div id="pg-pipeline" class="content" style="display:none;padding-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">Pipeline</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div id="pipeline-warning" style="display:none;font-size:12px;color:var(--warn);font-family:'JetBrains Mono',monospace;background:var(--warn-dim);padding:6px 12px;border-radius:var(--r);border:1px solid rgba(255,179,71,0.25)"></div>
+        <button class="btn btn-sm btn-warn" onclick="showBulkStatusModal()">⚙ Fix Missing Statuses</button>
+      </div>
+    </div>
+    <div class="pipeline" id="pipe-board"></div>
+  </div>
+
+  <!-- INBOX — full height, no scroll wrapper -->
+  <div id="pg-inbox" class="content-flush" style="display:none">
+    <div class="inbox-wrap">
+      <div class="inbox-sidebar">
+        <div class="inbox-sidebar-hdr">
+          <div class="inbox-sidebar-title">Conversations</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" onclick="pollRepliesNow()" title="Sync new replies" style="padding:4px 8px;font-size:11px">↻</button>
+          </div>
+        </div>
+        <div class="inbox-search-wrap">
+          <input type="text" id="inbox-q" placeholder="Search by name..." oninput="renderInbox(this.value)" style="margin-bottom:6px">
+          <select id="inbox-stage-filter" onchange="renderInbox(document.getElementById('inbox-q').value)" style="width:100%;font-size:11px;padding:5px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:'Syne',sans-serif">
+            <option value="">All stages</option>
+            <option value="Saved">Saved</option>
+            <option value="Opener Sent">Opener Sent</option>
+            <option value="Engaged">Engaged ⚡</option>
+            <option value="Warm">Warm 🔥</option>
+            <option value="Hot">Hot 🚀</option>
+            <option value="Booked">Booked 📅</option>
+            <option value="Follow Up Later">Follow Up Later ⏰</option>
+            <option value="Called">Called 📞</option>
+            <option value="Closed">Closed ✅</option>
+            <option value="Lost">Lost</option>
+            <option value="Opt-Out">Opt-Out</option>
+          </select>
+        </div>
+        <div class="convo-list" id="convo-list"><div class="empty" style="padding:28px 14px;font-size:12px">No conversations yet.<br>Send a blast to get started.</div></div>
+      </div>
+      <div id="chat-panel-wrap" class="chat-panel">
+        <div class="chat-empty"><svg width="32" height="32" viewBox="0 0 16 16" fill="none"><path d="M2 3h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3z" stroke="var(--text3)" stroke-width="1.2" fill="none"/><path d="M2 3l6 5.5L14 3" stroke="var(--text3)" stroke-width="1.2" stroke-linecap="round"/></svg><span>Select a conversation</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pg-finder" class="content" style="display:none">
+    <div class="alert alert-warn" id="finder-api-warn" style="display:none">Google Places API key not set. Go to Settings → Lead Finder API.</div>
+    <div class="finder-bar">
+      <div class="form-group" style="flex:2;min-width:160px"><label class="form-label">Niche / Business Type</label><input type="text" id="f-niche" placeholder="roofers, plumbers, HVAC..." onkeydown="if(event.key==='Enter')searchLeads()"></div>
+      <div class="form-group" style="flex:2;min-width:160px"><label class="form-label">Center Location</label><input type="text" id="f-location" placeholder="Irvine CA, 92618..." onkeydown="if(event.key==='Enter')searchLeads()"><div class="form-hint">Radius expands outward from this point</div></div>
+      <div class="form-group" style="min-width:120px"><label class="form-label">Search Radius</label>
+        <select id="f-radius" style="width:auto">
+          <option value="8000">5 miles</option><option value="16000">10 miles</option>
+          <option value="25000">15 miles</option><option value="40000" selected>25 miles</option>
+          <option value="50000">30 miles</option><option value="50000_2">50 miles</option>
+          <option value="50000_4">100 miles</option><option value="50000_7">150 miles</option>
+        </select>
+      </div>
+      <div class="form-group" style="min-width:100px"><label class="form-label">Min Reviews</label><select id="f-min-rev" style="width:auto"><option value="0">Any</option><option value="5">5+</option><option value="10">10+</option><option value="25">25+</option><option value="50">50+</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="form-label">Max Reviews</label><select id="f-max-rev" style="width:auto"><option value="999999">Any</option><option value="75">≤75</option><option value="50">≤50</option><option value="25">≤25</option><option value="10">≤10</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="form-label">Min Rating</label><select id="f-min-rat" style="width:auto"><option value="0">Any</option><option value="3">3+</option><option value="4">4+</option><option value="4.5">4.5+</option></select></div>
+      <div class="form-group" style="min-width:100px"><label class="form-label">Has Phone</label><select id="f-has-phone" style="width:auto"><option value="0">All</option><option value="1">With phone only</option></select></div>
+      <div style="padding-top:20px"><button class="btn btn-primary" id="search-btn" onclick="searchLeads()">Search Leads</button></div>
+    </div>
+    <div class="finder-results" id="finder-results" style="display:none">
+      <div class="finder-toolbar">
+        <div style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="chk-leads-all" onchange="toggleLeads(this)"><span class="finder-count" id="finder-count">0 leads found</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="addSelectedLeads()">Add to Contacts</button>
+          <button class="btn btn-sm btn-primary" onclick="addAndBlast()">⚡ Add + SMS Blast</button>
+        </div>
+      </div>
+      <div class="lead-header"><div></div><div>Business</div><div>Phone</div><div>Website</div><div>Rating</div><div>Reviews</div><div></div></div>
+      <div id="leads-body"></div>
+    </div>
+  </div>
+
+  <div id="pg-campaigns" class="content" style="display:none">
+    <div class="section-hdr"><div class="section-hdr-title">SMS Campaigns</div><button class="btn btn-primary btn-sm" onclick="openM('new-campaign')">+ New Campaign</button></div>
+    <div id="camp-list"><div class="empty">No campaigns yet.</div></div>
+  </div>
+
+  <div id="pg-templates" class="content" style="display:none">
+    <div class="section-hdr"><div class="section-hdr-title">Message Templates</div><button class="btn btn-primary btn-sm" onclick="openM('new-template')">+ New Template</button></div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px;font-family:'JetBrains Mono',monospace">Tags: <span class="tag">[Business Name]</span><span class="tag">[Industry]</span><span class="tag">[Your Name]</span><span class="tag">[Agency]</span><span class="tag">[Calendly]</span></div>
+    <div id="tpl-list"></div>
+  </div>
+
+  <!-- CALENDAR PAGE -->
+  <div id="pg-calendar" class="content" style="display:none">
+    <div class="cal-wrap">
+      <!-- Google Calendar embed -->
+      <div class="cal-embed">
+        <div class="cal-embed-hdr">
+          <div class="cal-embed-title">Google Calendar</div>
+          <button class="btn btn-sm" onclick="nav(document.querySelector('[data-page=settings]'))">Configure</button>
+        </div>
+        <div class="cal-iframe-wrap" id="gcal-wrap">
+          <div class="cal-not-set">
+            <svg width="32" height="32" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="12" rx="1.5" stroke="var(--text3)" stroke-width="1.2" fill="none"/><line x1="5" y1="1" x2="5" y2="5" stroke="var(--text3)" stroke-width="1.3" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="5" stroke="var(--text3)" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="7" x2="15" y2="7" stroke="var(--text3)" stroke-width="1.2"/></svg>
+            Google Calendar not connected.<br>Go to Settings → Calendar to paste your embed URL.
+            <button class="btn btn-sm" onclick="nav(document.querySelector('[data-page=settings]'))">Go to Settings</button>
+          </div>
+        </div>
+      </div>
+      <!-- Calendly embed -->
+      <div class="cal-embed">
+        <div class="cal-embed-hdr">
+          <div class="cal-embed-title">Calendly — My Schedule</div>
+          <button class="btn btn-sm btn-success" onclick="copyCalendlyLink()">Copy Booking Link</button>
+        </div>
+        <div class="cal-iframe-wrap" id="calendly-wrap">
+          <div class="cal-not-set">
+            <svg width="32" height="32" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--text3)" stroke-width="1.2" fill="none"/><line x1="8" y1="5" x2="8" y2="9" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r="0.8" fill="var(--text3)"/></svg>
+            Calendly not connected.<br>Go to Settings → Calendly to paste your link.
+            <button class="btn btn-sm" onclick="nav(document.querySelector('[data-page=settings]'))">Go to Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+<!-- ACCOUNT CENTER PAGE -->
+<div id="pg-account-center" class="page" style="display:none;padding:28px 32px;max-width:760px;overflow-y:auto;height:100%">
+  <div style="font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px">My Account</div>
+  <div style="font-size:13px;color:var(--text3);margin-bottom:28px;font-family:'JetBrains Mono',monospace">Your plan, usage, and performance overview</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px" id="ac-stats-grid">
+    <div class="stat-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:8px">Total Contacts</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:-1px" id="ac-total-contacts">0</div>
+    </div>
+    <div class="stat-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:8px">Total SMS Sent</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--accent)" id="ac-total-sms">0</div>
+    </div>
+    <div class="stat-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:8px">Total Replies</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--green)" id="ac-total-replies">0</div>
+    </div>
+    <div class="stat-card" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:8px">Reply Rate</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--warn)" id="ac-reply-rate">—</div>
+    </div>
+  </div>
+
+  <!-- Pipeline breakdown -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Pipeline Breakdown</div>
+    <div id="ac-pipeline-breakdown" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+  </div>
+
+  <!-- Template performance -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Template Performance</div>
+    <div id="ac-template-perf" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+
+  <!-- Account info -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Account Info</div>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:13px" id="ac-info">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--text3)">Agency</span>
+        <span id="ac-agency-name" style="color:var(--text);font-weight:600">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--text3)">Your name</span>
+        <span id="ac-user-name" style="color:var(--text);font-weight:600">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--text3)">Twilio number</span>
+        <span id="ac-twilio-num" style="color:var(--text);font-family:'JetBrains Mono',monospace">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0">
+        <span style="color:var(--text3)">Templates saved</span>
+        <span id="ac-tpl-count" style="color:var(--text);font-weight:600">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Quick Actions</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="nav(document.querySelector('[data-page=finder]'))">🔍 Find New Leads</button>
+      <button class="btn" onclick="nav(document.querySelector('[data-page=templates]'))">✏️ Edit Templates</button>
+      <button class="btn" onclick="nav(document.querySelector('[data-page=settings]'))">⚙️ Settings</button>
+      <button class="btn btn-danger" onclick="if(confirm('Export all data?')) exportData()">📦 Export Data</button>
+    </div>
+  </div>
+</div>
+
+<div id="pg-settings" class="content" style="display:none">
+    <div class="settings-section">
+      <div class="settings-title">Twilio — SMS Integration</div>
+      <div class="settings-desc">Required to send SMS. Sign up free at twilio.com (~$0.008/text)</div>
+      <div class="alert alert-info">Credentials saved only in your browser's localStorage. Never transmitted anywhere.</div>
+      <div id="cors-warning" class="alert alert-danger" style="display:none"><strong>CORS Error:</strong> You must host this app on Netlify — drag NorxAI.html to <a href="https://app.netlify.com/drop" target="_blank" style="color:inherit;text-decoration:underline">netlify.com/drop</a>.</div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">Account SID</label><input type="text" id="s-sid" placeholder="ACxxxxxxxxxxxxxxxx"></div>
+        <div class="form-group"><label class="form-label">Auth Token</label><input type="password" id="s-token"></div>
+      </div>
+      <div class="form-group"><label class="form-label">From Number</label><input type="text" id="s-from" placeholder="+15550001234"><div class="form-hint">Must be a Twilio number in E.164 format</div></div>
+      <div class="form-group"><label class="form-label">Delay between messages (seconds)</label><input type="number" id="s-delay" value="3" min="1" max="60"><div class="form-hint">3–5s recommended to avoid carrier filtering</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save Settings</button>
+        <button class="btn btn-sm" onclick="diagnoseTwilio()">Diagnose Connection</button>
+        <button class="btn btn-sm" onclick="pollRepliesNow()">Sync Replies Now</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Lead Finder — Google Places API (New)</div>
+      <div class="settings-desc">Powers the Lead Finder. Free at console.cloud.google.com ($200/mo credit)</div>
+      <div class="alert alert-info">Enable: <strong>Places API (New)</strong> + <strong>Geocoding API</strong> in Google Console. Same key for both.</div>
+      <div class="form-group"><label class="form-label">Google Places API Key</label><input type="text" id="s-gkey" placeholder="AIzaSy..."></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
+        <button class="btn btn-sm" onclick="testPlacesAPI()">Test Key</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Calendly Integration</div>
+      <div class="settings-desc">Paste your Calendly link — it appears in Calendar view and as a quick-reply chip in every conversation</div>
+      <div class="form-group"><label class="form-label">Calendly URL</label><input type="text" id="s-calendly" placeholder="https://calendly.com/yourname/30min"></div>
+      <div class="form-hint" style="margin-bottom:10px">Use [Calendly] tag in templates to auto-insert your link into messages</div>
+      <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Google Calendar Embed</div>
+      <div class="settings-desc">Shows your Google Calendar inside Norx AI on the Calendar page</div>
+      <div class="alert alert-info">
+        How to get your embed URL:<br>
+        1. Open Google Calendar → Settings → Settings for my calendars<br>
+        2. Click your calendar → scroll to "Integrate calendar"<br>
+        3. Copy the <strong>Embed code</strong> — paste just the src="..." URL below
+      </div>
+      <div class="form-group"><label class="form-label">Google Calendar Embed URL</label><input type="text" id="s-gcal" placeholder="https://calendar.google.com/calendar/embed?src=..."></div>
+      <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Your Profile</div>
+      <div class="settings-desc">Used in template tags [Your Name] and [Agency]</div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">Your Name</label><input type="text" id="s-name" placeholder="Gabe"></div>
+        <div class="form-group"><label class="form-label">Agency Name</label><input type="text" id="s-agency" placeholder="Norx Media"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Compliance</div>
+      <div class="settings-desc">Opt-out text auto-appended to all outbound SMS</div>
+      <div class="form-group"><label class="form-label">Opt-out suffix</label><input type="text" id="s-optout-msg" placeholder="Reply STOP to opt out."></div>
+      <div class="alert alert-warn">Contacts who reply STOP are automatically marked Opt-Out and excluded from all future campaigns.</div>
+      <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Data Management & Migration</div>
+      <div class="settings-desc">Export, import, or migrate your full data between app versions or URLs</div>
+      <div class="alert alert-info">
+        <strong>Moved to a new Netlify URL?</strong> Your contacts and conversations are stored in the browser for your old URL.<br>
+        1. Open your <strong>old Netlify URL</strong> → Settings → click "Export Full Backup"<br>
+        2. Come back to this new URL → click "Import Full Backup" → select the file<br>
+        All contacts, conversations, campaigns, stats and templates will be restored.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="btn btn-sm btn-success" onclick="exportFullBackup()">Export Full Backup (.json)</button>
+        <button class="btn btn-sm btn-primary" onclick="document.getElementById('backup-file-input').click()">Import Full Backup</button>
+        <input type="file" id="backup-file-input" accept=".json" style="display:none" onchange="importFullBackup(this)">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="exportCSV()">Export Contacts CSV</button>
+        <button class="btn btn-sm btn-danger" onclick="if(confirm('Delete ALL contacts?')){contacts=[];saveData();renderAll();toast('Cleared','error')}">Clear Contacts</button>
+        <button class="btn btn-sm btn-danger" onclick="if(confirm('Factory reset? Clears everything.')){localStorage.clear();location.reload()}">Factory Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ═══ MODALS ═══ -->
+<!-- ONBOARDING MODAL -->
+<div class="modal-bg" id="m-onboarding" style="z-index:600">
+  <div class="modal" style="max-width:540px;padding:0;overflow:hidden">
+    <div style="background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(167,139,250,0.1));padding:32px 32px 24px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#080a0e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div style="font-size:20px;font-weight:800;letter-spacing:-0.5px">Welcome to Norx AI</div>
+          <div style="font-size:13px;color:var(--text2)">Let's get you set up in 3 quick steps</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:24px 32px">
+      <!-- Steps -->
+      <div id="onboard-steps">
+        <!-- Step 1 -->
+        <div id="ob-step-1">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Step 1 of 3</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px">Connect Twilio for SMS</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px">
+            Twilio is what sends your text messages. Sign up free at <a href="https://twilio.com" target="_blank" style="color:var(--accent)">twilio.com</a>, get your credentials, then paste them below.
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;margin-bottom:18px">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px;font-weight:600">Quick setup:</div>
+            <div style="font-size:12px;color:var(--text3);line-height:2;font-family:'JetBrains Mono',monospace">
+              1. Go to twilio.com → sign up free<br>
+              2. Copy your Account SID + Auth Token<br>
+              3. Buy a phone number (~$1/mo)<br>
+              4. Paste credentials in Settings below
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="obStep1Done()">I have my Twilio credentials →</button>
+            <button class="btn" onclick="obSkip(1)">Set up later</button>
+          </div>
+        </div>
+        <!-- Step 2 -->
+        <div id="ob-step-2" style="display:none">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Step 2 of 3</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px">Add Google Places API Key</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px">
+            This powers the Lead Finder — pulls real business phone numbers from Google Maps. Free to set up.
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;margin-bottom:18px">
+            <div style="font-size:12px;color:var(--text3);line-height:2;font-family:'JetBrains Mono',monospace">
+              1. Go to console.cloud.google.com<br>
+              2. New project → APIs & Services → Library<br>
+              3. Enable: Places API (New) + Geocoding API<br>
+              4. Credentials → Create API Key → copy it
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="obStep2Done()">I have my API key →</button>
+            <button class="btn" onclick="obSkip(2)">Set up later</button>
+          </div>
+        </div>
+        <!-- Step 3 -->
+        <div id="ob-step-3" style="display:none">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Step 3 of 3</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px">You're ready to launch 🚀</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">
+            Here's your quick start workflow:
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px">
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0">1</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Find leads</div><div style="font-size:12px;color:var(--text3)">Lead Finder → search your niche + city → select leads</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0">2</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Create templates</div><div style="font-size:12px;color:var(--text3)">Templates → edit the starter templates to match your offer</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0">3</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Send your first blast</div><div style="font-size:12px;color:var(--text3)">Lead Finder → select leads → ⚡ Add + Launch SMS Blast</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(0,229,160,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0">4</div>
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Track replies</div><div style="font-size:12px;color:var(--text3)">Inbox → reply to leads → move them through your Pipeline</div></div>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;padding:13px;font-size:14px" onclick="finishOnboarding()">Let's go →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-bg" id="m-add-contact"><div class="modal">
+  <div class="modal-title">Add Contact</div>
+  <div class="grid-2">
+    <div class="form-group"><label class="form-label">Business Name *</label><input type="text" id="n-biz"></div>
+    <div class="form-group"><label class="form-label">Industry</label><input type="text" id="n-ind" placeholder="Roofing"></div>
+    <div class="form-group"><label class="form-label">Phone (E.164)</label><input type="text" id="n-phone" placeholder="+19495001234"></div>
+    <div class="form-group"><label class="form-label">Email</label><input type="text" id="n-email"></div>
+    <div class="form-group"><label class="form-label">Website</label><input type="text" id="n-web"></div>
+    <div class="form-group"><label class="form-label">Status</label><select id="n-status"><option>Saved</option><option>Opener Sent</option><option>Engaged</option><option>Warm</option><option>Hot</option><option>Booked</option><option>Follow Up Later</option><option>Called</option><option>Closed</option><option>Lost</option><option>Opt-Out</option></select></div>
+  </div>
+  <div class="form-group"><label class="form-label">Notes</label><textarea id="n-notes"></textarea></div>
+  <div class="modal-footer"><button class="btn" onclick="closeM('add-contact')">Cancel</button><button class="btn btn-primary" onclick="addContact()">Add Contact</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-import"><div class="modal">
+  <div class="modal-title">Import Contacts</div>
+  <div class="alert alert-info">One per line: <strong>Name, Industry, Phone, Email</strong></div>
+  <div class="form-group"><textarea id="import-txt" style="min-height:160px;font-family:'JetBrains Mono',monospace;font-size:12px" placeholder="Pacific Roofing, Roofing, +19495001234, info@example.com"></textarea></div>
+  <div class="modal-footer"><button class="btn" onclick="closeM('import')">Cancel</button><button class="btn btn-primary" onclick="importContacts()">Import</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-new-campaign"><div class="modal modal-lg">
+  <div class="modal-title">Launch SMS Campaign</div>
+  <div class="alert alert-warn" id="camp-warn" style="display:none">Twilio not configured — go to Settings first.</div>
+  <div class="grid-2">
+    <div class="form-group"><label class="form-label">Campaign Name</label><input type="text" id="c-name" placeholder="Cold blast — roofers"></div>
+    <div class="form-group"><label class="form-label">Target Status</label><select id="c-target" onchange="updateCampCount()">
+  <option value="Saved">&#x25CF; Never contacted (Saved) — safest for new blasts</option>
+  <option value="Opener Sent">Opener Sent — texted once, no reply</option>
+  <option value="Engaged">Engaged — replied to you</option>
+  <option value="Warm">Warm leads</option>
+  <option value="Hot">Hot leads</option>
+  <option value="Booked">Booked</option>
+  <option value="Follow Up Later">Follow Up Later</option>
+  <option value="Called">Called</option>
+  <option value="all">All contacts (except Opt-Out)</option>
+</select></div>
+  </div>
+  <div class="form-group"><label class="form-label">Filter by Industry (optional)</label><select id="c-industry" onchange="updateCampCount()"><option value="">All industries</option></select></div>
+  <div class="form-group"><label class="form-label">Template</label><select id="c-tpl" onchange="updateCampPreview()"><option value="">-- Select template --</option></select></div>
+  <div class="form-group"><label class="form-label">Preview</label><div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 13px;font-size:12px;color:var(--text2);min-height:65px;font-family:'JetBrains Mono',monospace;line-height:1.7;white-space:pre-wrap" id="c-preview">Select a template above</div></div>
+  <div style="display:flex;gap:16px;padding:11px 14px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);margin-bottom:4px">
+    <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px">Recipients</div><div style="font-size:20px;font-weight:700;color:var(--accent)" id="c-count">0</div></div>
+    <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px">Est. Time</div><div style="font-size:20px;font-weight:700" id="c-time">0m</div></div>
+    <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px">Est. Cost</div><div style="font-size:20px;font-weight:700;color:var(--green)" id="c-cost">$0.00</div></div>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeM('new-campaign')">Cancel</button><button class="btn btn-primary" onclick="launchCampaign()">Send SMS Blast</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-new-template"><div class="modal">
+  <div class="modal-title" id="tpl-modal-title">New Template</div>
+  <div class="form-group"><label class="form-label">Template Name</label><input type="text" id="t-name" placeholder="Cold opener"></div>
+  <div class="form-group"><label class="form-label">Message</label><textarea id="t-body" style="min-height:110px;font-family:'JetBrains Mono',monospace;font-size:13px" placeholder="hey is this [Business Name]?"></textarea></div>
+  <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Tags: <span class="tag">[Business Name]</span><span class="tag">[Industry]</span><span class="tag">[Your Name]</span><span class="tag">[Agency]</span><span class="tag">[Calendly]</span></div>
+  <div class="modal-footer"><button class="btn" onclick="closeM('new-template')">Cancel</button><button class="btn btn-primary" onclick="saveTemplate()">Save Template</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-contact-detail"><div class="modal modal-lg">
+  <div class="modal-title" id="d-title"></div>
+  <div id="d-body"></div>
+  <div class="modal-footer"><button class="btn" onclick="closeM('contact-detail')">Close</button><button class="btn btn-success btn-sm" onclick="sendSingleSMS()">Send SMS Now</button></div>
+</div></div>
+
+<div class="modal-bg" id="m-sending"><div class="modal" style="text-align:center;padding:32px">
+  <div style="font-size:26px;font-weight:700;color:var(--accent);margin-bottom:8px" id="send-title">Sending...</div>
+  <div style="font-size:13px;color:var(--text3);margin-bottom:20px" id="send-sub">Do not close this window</div>
+  <div class="progress-bar"><div class="progress-fill" id="send-progress" style="width:0%;background:var(--accent)"></div></div>
+  <div style="font-size:12px;color:var(--text2);margin-top:10px;font-family:'JetBrains Mono',monospace;margin-bottom:16px" id="send-detail">0 / 0 sent</div>
+  <button class="btn btn-danger" id="cancel-camp-btn" onclick="cancelCampaign()" style="font-size:13px;padding:8px 20px">Stop Campaign</button>
+</div></div>
+
+<div class="modal-bg" id="m-bulk-status"><div class="modal">
+  <div class="modal-title">Fix Missing Statuses</div>
+  <div class="alert alert-warn" id="bulk-status-summary"></div>
+  <div class="form-group">
+    <label class="form-label">Assign these contacts to</label>
+    <select id="bulk-status-target">
+      <option value="Saved">Saved — just imported, never texted</option>
+      <option value="Opener Sent">Opener Sent — already sent first SMS</option>
+      <option value="Engaged">Engaged — they replied</option>
+      <option value="Warm">Warm — interested</option>
+    </select>
+    <div class="form-hint" style="margin-top:6px">This only affects contacts with no status or an unrecognized status. Contacts already in a valid stage are untouched.</div>
+  </div>
+  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:4px">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:600">Quick guide — which should you pick?</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.9;font-family:'JetBrains Mono',monospace">
+      → <strong style="color:var(--text)">Saved</strong> if you haven't texted any of them yet<br>
+      → <strong style="color:#5bc8e0">Opener Sent</strong> if you already blasted them (most likely your situation)<br>
+      → <strong style="color:var(--warn)">Engaged</strong> if they replied and you're in conversations<br>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" onclick="closeM('bulk-status')">Cancel</button>
+    <button class="btn btn-primary" onclick="applyBulkStatus()">Apply to All Unassigned</button>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="m-finder-blast"><div class="modal">
+  <div class="modal-title">⚡ Add + SMS Blast</div>
+  <div class="alert alert-success" id="finder-blast-info"></div>
+  <div class="form-group"><label class="form-label">Campaign Name</label><input type="text" id="fb-name"></div>
+  <div class="form-group"><label class="form-label">Template</label><select id="fb-tpl" onchange="updateFbPreview()"><option value="">-- Select template --</option></select></div>
+  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;font-size:12px;color:var(--text2);min-height:56px;font-family:'JetBrains Mono',monospace;line-height:1.7;white-space:pre-wrap;margin-bottom:12px" id="fb-preview">Select a template above</div>
+  <div class="modal-footer"><button class="btn" onclick="closeM('finder-blast')">Cancel</button><button class="btn btn-primary" onclick="execFinderBlast()">Send Blast</button></div>
+</div></div>
+
+
+
+<!-- CALL LIST PAGE -->
+<div id="pg-calllist" class="page" style="display:none;height:100%;overflow:hidden;flex-direction:column">
+  <div style="padding:20px 28px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-0.5px">Call List</div>
+        <div style="font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace" id="cl-count">—</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="text" id="cl-search" placeholder="🔍 Search business..." oninput="clRender()" style="padding:7px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Syne',sans-serif;font-size:12px;min-width:160px">
+      <select id="cl-industry" onchange="clRender()" style="padding:7px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:'Syne',sans-serif;font-size:12px">
+        <option value="">All Industries</option>
+      </select>
+      <select id="cl-stage" onchange="clRender()" style="padding:7px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:'Syne',sans-serif;font-size:12px">
+        <option value="">All Pipeline Stages</option>
+        <option value="Saved">Saved</option>
+        <option value="Opener Sent">Opener Sent</option>
+        <option value="Engaged">Engaged</option>
+        <option value="Warm">Warm 🔥</option>
+        <option value="Hot">Hot 🚀</option>
+        <option value="Booked">Booked 📅</option>
+        <option value="Follow Up Later">Follow Up Later</option>
+        <option value="Called">Called</option>
+        <option value="Closed">Closed</option>
+        <option value="Lost">Lost</option>
+      </select>
+      <select id="cl-callstatus" onchange="clRender()" style="padding:7px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:'Syne',sans-serif;font-size:12px">
+        <option value="">All Call Statuses</option>
+        <option value="Not Called">Not Called</option>
+        <option value="Need to Call">Need to Call</option>
+        <option value="No Answer">No Answer</option>
+        <option value="Called">Called ✓</option>
+        <option value="Booked">Booked 📅</option>
+        <option value="Opted Out">Opted Out</option>
+      </select>
+    </div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:0 28px 28px" id="cl-list"></div>
+</div>
+
+<script>
+// ── Global function proxies (defined early so HTML onclick works immediately) ──
+function nav(el){ window._navFn && window._navFn(el); }
+function openDetail(id){ window._openDetailFn && window._openDetailFn(id); }
+function openChatFromPipeline(id){ window._openChatFn && window._openChatFn(id); }
+
+// ═══════════════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════════════
+const SB_URL='https://eyofcybilytepouerssp.supabase.co';
+const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5b2ZjeWJpbHl0ZXBvdWVyc3NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3ODk3MDMsImV4cCI6MjA5MTM2NTcwM30.6Kj2I5guyQFaBW3EryWMeWGzbmitMfBCRdTMXzBR3ZE';
+
+const PLAN_LIMITS={
+  starter:{contacts:500,sms:1000,searches:5,campaigns:3},
+  pro:{contacts:2500,sms:5000,searches:20,campaigns:10},
+  agency:{contacts:Infinity,sms:Infinity,searches:Infinity,campaigns:Infinity},
+};
+
+let currentUser=null; // {id, email, token, plan, isBeta}
+
+async function sbFetch(path,opts={}){
+  const headers={'apikey':SB_ANON,'Content-Type':'application/json',...(currentUser?{'Authorization':'Bearer '+currentUser.token}:{}),  ...(opts.headers||{})};
+  const r=await fetch(SB_URL+'/rest/v1/'+path,{...opts,headers});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||'DB '+r.status);}
+  const t=await r.text();return t?JSON.parse(t):null;
+}
+
+async function getProfile(){
+  if(!currentUser) return null;
+  try{const rows=await sbFetch('profiles?id=eq.'+currentUser.id+'&select=*');return rows?.[0]||null;}
+  catch(e){return null;}
+}
+
+async function checkPlanLimit(type){
+  if(!currentUser) return {ok:true};
+  const profile=await getProfile();
+  if(!profile||profile.is_beta) return {ok:true};
+  const plan=profile.plan||'starter';
+  const limits=PLAN_LIMITS[plan];
+  const month=new Date().toISOString().slice(0,7);
+  try{
+    const rows=await sbFetch('usage?user_id=eq.'+currentUser.id+'&month=eq.'+month+'&select=*');
+    const u=rows?.[0]||{};
+    const map={contact:['contacts_count',limits.contacts,'contacts'],sms:['sms_sent',limits.sms,'SMS'],search:['finder_searches',limits.searches,'Lead Finder searches'],campaign:['campaigns_count',limits.campaigns,'campaigns']};
+    const [field,limit,label]=map[type]||[];
+    if(field&&limit!==Infinity&&(u[field]||0)>=limit){
+      return{ok:false,msg:`${label} limit reached (${limit} on ${plan} plan). <a href="/account" style="color:inherit;text-decoration:underline">Upgrade your plan →</a>`};
+    }
+  }catch(e){return{ok:true};}
+  return{ok:true};
+}
+
+async function incrementUsage(type,amount=1){
+  if(!currentUser) return;
+  const month=new Date().toISOString().slice(0,7);
+  const field={contact:'contacts_count',sms:'sms_sent',search:'finder_searches',campaign:'campaigns_count'}[type];
+  if(!field) return;
+  try{
+    // Try to get existing row first
+    const rows=await sbFetch('usage?user_id=eq.'+currentUser.id+'&month=eq.'+month+'&select=*');
+    if(rows&&rows.length>0){
+      const cur=rows[0][field]||0;
+      await sbFetch('usage?id=eq.'+rows[0].id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({[field]:cur+amount})});
+    }else{
+      await sbFetch('usage',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({user_id:currentUser.id,month,[field]:amount})});
+    }
+  }catch(e){console.warn('incrementUsage:',e);}
+}
+
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let contacts=[],templates=[],campaigns=[],conversations={},stats={sent:0,replies:0,optouts:0};
+let activityLog=[];
+let editTplId=null,currentDetailId=null,currentPage='dashboard',finderResults=[];
+let activeConvoId=null,inboxUnread={};
+let pollTimer=null,lastPollTs=0;
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+async function init(){
+  // ── Auth check — redirect to login if not signed in ──
+  const token=localStorage.getItem('norx-auth-token');
+  const userId=localStorage.getItem('norx-user-id');
+  const email=localStorage.getItem('norx-user-email');
+  if(!token||!userId){
+    window.location.href='/login';
+    return;
+  }
+  // Validate token with Supabase before proceeding
+  try{
+    const authCheck=await fetch(SB_URL+'/auth/v1/user',{
+      headers:{'apikey':SB_ANON,'Authorization':'Bearer '+token}
+    });
+    if(!authCheck.ok){
+      // Token invalid — clear and redirect to login
+      localStorage.removeItem('norx-auth-token');
+      localStorage.removeItem('norx-user-id');
+      localStorage.removeItem('norx-user-email');
+      localStorage.removeItem('norx-refresh-token');
+      window.location.href='/login';
+      return;
+    }
+    // Update user id from validated session
+    const authData=await authCheck.json();
+    if(authData.id) localStorage.setItem('norx-user-id',authData.id);
+    if(authData.email) localStorage.setItem('norx-user-email',authData.email);
+  }catch(e){
+    // Network error — continue with cached data
+    console.warn('Auth validation failed, using cached session:',e);
+  }
+  currentUser={id:userId,email,token,plan:localStorage.getItem('norx-user-plan')||'starter'};
+
+  // ── Load from Supabase first, fallback to localStorage ──
+  showAppLoader('Loading your workspace...');
+  await loadDataFromSupabase();
+  if(!templates.length) seedTemplates();
+  loadSettings();
+  hideAppLoader();
+  renderAll();
+  updateStatuses();
+  checkHosting();
+  startPolling();
+  showUserInfo();
+
+  // ── Show onboarding if first time ──
+  const onboarded=localStorage.getItem('norx-onboarded');
+  if(!onboarded) showOnboarding();
+}
+
+function seedContacts(){
+  contacts=[
+    {id:1,name:'All About Roofing Repair & Installation',industry:'Roofing',phone:'',email:'info@aaroof.net',website:'https://aaroof.net',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:2,name:'South County Roofing',industry:'Roofing',phone:'',email:'customerservice@southcountyroofing.com',website:'https://southcountyroofing.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:3,name:'Canyon Roofing Contractors',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:4,name:'Everereen Roofing Contractor Services Irvine',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:5,name:'Laguna Hills Roofing',industry:'Roofing',phone:'',email:'',website:'https://lagunahills-roofing.company',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:6,name:'Merit Roofing & Waterproofing',industry:'Roofing',phone:'',email:'info@precisionroofingoc.com',website:'https://precisionroofingoc.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:7,name:'OC Custom Roofing',industry:'Roofing',phone:'',email:'',website:'https://occommercialroofing.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:8,name:'Pro Roofing Company Irvine',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:9,name:'Central Roofing Company Irvine',industry:'Roofing',phone:'',email:'',website:'https://centralroof.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:10,name:'Pacific Roofing Systems',industry:'Roofing',phone:'',email:'',website:'https://pacificroofingsystems.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:11,name:'McCormack Roofing',industry:'Roofing',phone:'',email:'info@mccormackroofing.com',website:'https://mccormackroofing.com',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:12,name:'RESCUE ROOFER Mission Viejo',industry:'Roofing',phone:'',email:'',website:'https://rescueroofer.net',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:13,name:'Infinity Roofing Irvine CA',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:14,name:'Empire West Roofing',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+    {id:15,name:'South County Roofing (Lake Forest)',industry:'Roofing',phone:'',email:'',website:'',status:'Saved',notes:'',lastContact:'—',smsSent:0},
+  ];
+  saveData();
+}
+
+function seedTemplates(){
+  templates=[
+    {
+      id:1,
+      name:'1. Cold Opener',
+      body:'hey is this [Business Name]?',
+      type:'opener',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:2,
+      name:'2. Follow-Up (edit to match your offer)',
+      body:"Hey [Business Name], following up on my last message.\n\nI work with [Industry] businesses to help them get more qualified leads — would love to connect if there's a fit.\n\nReply STOP to opt out.",
+      type:'followup',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:3,
+      name:'3. Second Follow-Up',
+      body:"Hey just circling back one more time — happy to connect whenever the timing is right for [Business Name].\n\nReply STOP to opt out.",
+      type:'followup',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:4,
+      name:'4. Warm Lead Response',
+      body:"Hey [Business Name]! Great to hear from you. I'd love to jump on a quick 10-min call this week to see if I can help — what does your schedule look like?\n\nReply STOP to opt out.",
+      type:'warm',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:5,
+      name:'5. Send Booking Link',
+      body:"Sounds great! Here's a link to grab a time: [Calendly]\n\nLooking forward to it!",
+      type:'booking',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:6,
+      name:'6. Follow Up Later Check-in',
+      body:"Hey [Business Name], just wanted to check back in — is now a better time to connect?\n\nReply STOP to opt out.",
+      type:'followup',
+      stats:{sent:0,replies:0}
+    },
+    {
+      id:7,
+      name:'7. Closed Won',
+      body:"Excited to work with you [Business Name]! I'll be in touch shortly with next steps.",
+      type:'closed',
+      stats:{sent:0,replies:0}
+    },
+  ];
+  saveData();
+}
+
+// ═══════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════
+function saveData(){
+  try{
+    localStorage.setItem('norx-contacts',JSON.stringify(contacts));
+    localStorage.setItem('norx-templates',JSON.stringify(templates));
+    localStorage.setItem('norx-campaigns',JSON.stringify(campaigns));
+    localStorage.setItem('norx-stats',JSON.stringify(stats));
+    localStorage.setItem('norx-convos',JSON.stringify(conversations));
+    localStorage.setItem('norx-activity',JSON.stringify(activityLog.slice(-100)));
+    localStorage.setItem('norx-unread',JSON.stringify(inboxUnread));
+  }catch(e){}
+}
+function loadData(){
+  try{
+    contacts=JSON.parse(localStorage.getItem('norx-contacts')||'[]');
+    templates=JSON.parse(localStorage.getItem('norx-templates')||'[]');
+    campaigns=JSON.parse(localStorage.getItem('norx-campaigns')||'[]');
+    stats=JSON.parse(localStorage.getItem('norx-stats')||'{"sent":0,"replies":0,"optouts":0}');
+    conversations=JSON.parse(localStorage.getItem('norx-convos')||'{}');
+    activityLog=JSON.parse(localStorage.getItem('norx-activity')||'[]');
+    inboxUnread=JSON.parse(localStorage.getItem('norx-unread')||'{}');
+  }catch(e){contacts=[];templates=[];campaigns=[];stats={sent:0,replies:0,optouts:0};conversations={};activityLog=[];inboxUnread={};}
+}
+
+// ═══════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════
+function saveSettings(){
+  ['s-sid','s-token','s-from','s-delay','s-name','s-agency','s-optout-msg','s-gkey','s-calendly','s-gcal'].forEach(id=>{
+    const el=document.getElementById(id);if(el) localStorage.setItem('norx-'+id,el.value);
+  });
+  const name=document.getElementById('s-name')?.value||'Gabe';
+  document.getElementById('sidebar-name').textContent=name;
+  document.getElementById('sidebar-avatar').textContent=name[0].toUpperCase();
+  updateStatuses();
+  renderCalendar();
+  toast('Settings saved!','success');
+}
+function loadSettings(){
+  ['s-sid','s-token','s-from','s-delay','s-name','s-agency','s-optout-msg','s-gkey','s-calendly','s-gcal'].forEach(id=>{
+    const el=document.getElementById(id);
+    const val=localStorage.getItem('norx-'+id);
+    if(el&&val) el.value=val;
+  });
+  const name=localStorage.getItem('norx-s-name')||'Gabe';
+  document.getElementById('sidebar-name').textContent=name;
+  document.getElementById('sidebar-avatar').textContent=name[0].toUpperCase();
+  const om=document.getElementById('s-optout-msg');if(om&&!om.value) om.value='Reply STOP to opt out.';
+}
+function getTwilio(){return{sid:localStorage.getItem('norx-s-sid')||'',token:localStorage.getItem('norx-s-token')||'',from:localStorage.getItem('norx-s-from')||'',delay:parseInt(localStorage.getItem('norx-s-delay')||'3')};}
+function isTwilioOk(){const c=getTwilio();return !!(c.sid&&c.token&&c.from);}
+function getGKey(){return localStorage.getItem('norx-s-gkey')||'';}
+function getCalendly(){return localStorage.getItem('norx-s-calendly')||'';}
+function getGCal(){return localStorage.getItem('norx-s-gcal')||'';}
+
+function updateStatuses(){
+  const dot=document.getElementById('twilio-dot'),txt=document.getElementById('twilio-txt');
+  if(isTwilioOk()){dot.style.background='var(--green)';dot.style.animation='pulse 2s infinite';txt.textContent='Twilio connected';}
+  else{dot.style.background='var(--text3)';dot.style.animation='none';txt.textContent='Twilio not configured';}
+  document.getElementById('maps-pill').style.display=getGKey()?'flex':'none';
+}
+function checkHosting(){
+  if(window.location.protocol==='file:'){
+    const w=document.getElementById('cors-warning');if(w) w.style.display='block';
+    const pill=document.createElement('div');
+    pill.className='status-pill';pill.style.cssText='background:rgba(255,95,95,0.12);border-color:rgba(255,95,95,0.3);color:var(--danger);cursor:pointer';
+    pill.innerHTML='<span class="status-dot" style="background:var(--danger)"></span><span>Host on Netlify for SMS</span>';
+    pill.onclick=()=>nav(document.querySelector('[data-page=settings]'));
+    document.querySelector('.topbar-right').prepend(pill);
+  }
+}
+async function diagnoseTwilio(){
+  const cfg=getTwilio();
+  const issues=[];
+  if(!cfg.sid) issues.push('Account SID empty');
+  if(!cfg.token) issues.push('Auth token empty');
+  if(!cfg.from) issues.push('From number empty');
+  if(cfg.from&&!cfg.from.startsWith('+')) issues.push('From number must start with + (E.164)');
+  if(issues.length){toast('Fix: '+issues.join(' · '),'error');return;}
+  toast('Testing Twilio credentials...','info');
+  try{
+    const r=await fetch(`https://api.twilio.com/2010-04-01/Accounts/${cfg.sid}.json`,{headers:{'Authorization':'Basic '+btoa(cfg.sid+':'+cfg.token)}});
+    if(!r.ok){toast('Auth failed — re-copy SID and token from twilio.com/console','error');return;}
+    const d=await r.json();
+    const trial=d.type==='Trial'?' (Trial — add funds to text unverified numbers)':'';
+    toast('Connected: '+d.friendly_name+trial,'success');
+  }catch(e){
+    if(e.message.includes('Failed to fetch')||e.message.includes('CORS')) toast('CORS — host app on Netlify, not as local file','error');
+    else toast('Error: '+e.message,'error');
+  }
+}
+async function testPlacesAPI(){
+  const key=getGKey();if(!key){toast('Enter API key first.','error');return;}
+  toast('Testing...','info');
+  try{
+    const r=await fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':'places.displayName'},body:JSON.stringify({textQuery:'coffee shop',maxResultCount:1})});
+    const d=await r.json();
+    if(d.places) toast('Places API (New) connected!','success');
+    else if(d.error) toast('API error: '+d.error.message,'error');
+  }catch(e){toast('Failed: '+e.message,'error');}
+}
+
+// ═══════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════
+function renderCalendar(){
+  // Google Calendar
+  const gcalUrl=getGCal();
+  const gcalWrap=document.getElementById('gcal-wrap');
+  if(gcalUrl){
+    gcalWrap.innerHTML=`<iframe src="${gcalUrl}" style="width:100%;height:100%;border:none"></iframe>`;
+  }else{
+    gcalWrap.innerHTML=`<div class="cal-not-set"><svg width="32" height="32" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="12" rx="1.5" stroke="var(--text3)" stroke-width="1.2" fill="none"/><line x1="5" y1="1" x2="5" y2="5" stroke="var(--text3)" stroke-width="1.3" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="5" stroke="var(--text3)" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="7" x2="15" y2="7" stroke="var(--text3)" stroke-width="1.2"/></svg>Google Calendar not connected.<br>Go to Settings → Google Calendar Embed.<button class="btn btn-sm" onclick="nav(document.querySelector('[data-page=settings]'))" style="margin-top:10px">Go to Settings</button></div>`;
+  }
+  // Calendly
+  const calLink=getCalendly();
+  const calWrap=document.getElementById('calendly-wrap');
+  if(calLink){
+    calWrap.innerHTML=`<iframe src="${calLink}" style="width:100%;height:100%;border:none"></iframe>`;
+  }else{
+    calWrap.innerHTML=`<div class="cal-not-set"><svg width="32" height="32" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--text3)" stroke-width="1.2" fill="none"/><line x1="8" y1="5" x2="8" y2="9" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r="0.8" fill="var(--text3)"/></svg>Calendly not connected.<br>Go to Settings → Calendly.<button class="btn btn-sm" onclick="nav(document.querySelector('[data-page=settings]'))" style="margin-top:10px">Go to Settings</button></div>`;
+  }
+}
+function copyCalendlyLink(){
+  const link=getCalendly();
+  if(!link){toast('No Calendly link set. Add it in Settings.','error');return;}
+  navigator.clipboard.writeText(link).then(()=>toast('Calendly link copied!','success')).catch(()=>toast(link,'info'));
+}
+
+// ═══════════════════════════════════════════════
+// REPLY POLLING — fetches inbound SMS from Twilio every 30s
+// ═══════════════════════════════════════════════
+function startPolling(){
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer=setInterval(()=>{if(isTwilioOk()) fetchReplies();},30000);
+  // Also poll immediately on load if configured
+  if(isTwilioOk()) setTimeout(fetchReplies,2000);
+}
+
+async function pollRepliesNow(){
+  if(!isTwilioOk()){toast('Configure Twilio in Settings first.','error');return;}
+  toast('Syncing replies...','info');
+  await fetchReplies();
+}
+
+async function fetchReplies(){
+  const cfg=getTwilio();
+  if(!cfg.sid||!cfg.token) return;
+  const pill=document.getElementById('poll-pill'),txt=document.getElementById('poll-txt');
+  if(pill) pill.style.display='flex';
+  if(txt) txt.textContent='Syncing replies...';
+  try{
+    // Fetch last 200 inbound messages to Twilio number
+    const url=`https://api.twilio.com/2010-04-01/Accounts/${cfg.sid}/Messages.json?To=${encodeURIComponent(cfg.from)}&PageSize=100`;
+    const r=await fetch(url,{headers:{'Authorization':'Basic '+btoa(cfg.sid+':'+cfg.token)}});
+    if(!r.ok) return;
+    const data=await r.json();
+    const messages=data.messages||[];
+    let newReplies=0;
+    messages.forEach(msg=>{
+      const fromNum=msg.from;
+      const body=msg.body||'';
+      const sid=msg.sid;
+      const ts=new Date(msg.date_sent).getTime()||Date.now();
+      // Find matching contact by phone
+      const contact=contacts.find(c=>c.phone&&normalizePhone(c.phone)===normalizePhone(fromNum));
+      if(!contact) return;
+      const cid=contact.id;
+      if(!conversations[cid]) conversations[cid]=[];
+      // Check if this message SID is already stored
+      const alreadyStored=conversations[cid].some(m=>m.sid===sid);
+      if(!alreadyStored){
+        conversations[cid].push({dir:'in',text:body,time:new Date(ts).toLocaleTimeString(),ts,sid});
+        newReplies++;
+        // Opt-out detection
+        if(body.trim().toUpperCase()==='STOP'||body.toLowerCase().includes('stop')){
+          contact.status='Opt-Out';stats.optouts++;
+          logActivity(`${contact.name} opted out`,'danger');
+        }else{
+          // Auto-promote Cold → Warm on first reply
+          if(contact.status==='Saved'||contact.status==='Cold'){
+            contact.status='Opener Sent'; // shouldn't normally be here but fix legacy
+            logActivity(`${contact.name} replied — auto-promoted`,'warn');
+          } else if(contact.status==='Opener Sent'){
+            contact.status='Engaged';
+            logActivity(`${contact.name} replied → promoted to Engaged`,'warn');
+            // Credit the reply to the last template used
+            const lastOut=(conversations[cid]||[]).filter(m=>m.dir==='out').pop();
+            if(lastOut?.templateId){
+              const t=templates.find(x=>x.id==lastOut.templateId);
+              if(t){if(!t.stats) t.stats={sent:0,replies:0};t.stats.replies=(t.stats.replies||0)+1;}
+              saveData();
+            }
+          }else{
+            logActivity(`New reply from ${contact.name}`,'accent');
+          }
+          // Mark as unread
+          inboxUnread[cid]=true;
+          stats.replies++;
+        }
+      }
+    });
+    if(newReplies>0){
+      saveData();renderAll();
+      toast(`${newReplies} new repl${newReplies===1?'y':'ies'} received!`,'success');
+      if(currentPage==='inbox') renderInbox();
+    }
+    lastPollTs=Date.now();
+    if(txt) txt.textContent=`Last sync: ${new Date().toLocaleTimeString()}`;
+    setTimeout(()=>{if(pill) pill.style.display='none';},3000);
+  }catch(e){
+    if(pill) pill.style.display='none';
+  }
+}
+
+function normalizePhone(p){
+  if(!p) return '';
+  return p.replace(/[\s\-\(\)\.]/g,'');
+}
+
+// ═══════════════════════════════════════════════
+// ACTIVITY LOG
+// ═══════════════════════════════════════════════
+function logActivity(text,type='accent'){
+  activityLog.unshift({text,type,time:new Date().toLocaleTimeString(),ts:Date.now()});
+  if(activityLog.length>100) activityLog=activityLog.slice(0,100);
+}
+
+// ═══════════════════════════════════════════════
+// SMS SENDING
+// ═══════════════════════════════════════════════
+function personalize(msg,c){
+  const name=localStorage.getItem('norx-s-name')||'Gabe';
+  const agency=localStorage.getItem('norx-s-agency')||'our agency';
+  const cal=getCalendly()||'[your Calendly link]';
+  return msg.replace(/\[Business Name\]/g,c.name).replace(/\[Industry\]/g,c.industry).replace(/\[Your Name\]/g,name).replace(/\[Agency\]/g,agency).replace(/\[Calendly\]/g,cal);
+}
+function buildMessage(body,c){
+  const optout=localStorage.getItem('norx-s-optout-msg')||'Reply STOP to opt out.';
+  let msg=personalize(body,c);
+  if(!msg.toLowerCase().includes('stop')) msg+='\n\n'+optout;
+  return msg;
+}
+async function sendSMS(to,body,cfg){
+  const url=`https://api.twilio.com/2010-04-01/Accounts/${cfg.sid}/Messages.json`;
+  let r,d;
+  try{
+    r=await fetch(url,{method:'POST',headers:{'Authorization':'Basic '+btoa(cfg.sid+':'+cfg.token),'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({To:to,From:cfg.from,Body:body})});
+    d=await r.json();
+  }catch(e){throw new Error('CORS — host app on Netlify, not as local file');}
+  if(!r.ok){
+    const code=d.code||'';const msg=d.message||'Send failed';
+    if(code===21608) throw new Error('Unverified number (trial) — add funds to Twilio');
+    if(code===21211) throw new Error('Invalid To number: '+to);
+    if(code===21212) throw new Error('Invalid From number — check Settings');
+    if(code===20003) throw new Error('Twilio auth failed — re-check SID/token');
+    if(code===21610) throw new Error('Number has opted out');
+    throw new Error(`Twilio ${code}: ${msg}`);
+  }
+  return d;
+}
+async function launchCampaign(){
+  const name=document.getElementById('c-name').value.trim();
+  const target=document.getElementById('c-target').value;
+  const industry=document.getElementById('c-industry')?.value||'';
+  const tpl=templates.find(t=>t.id==document.getElementById('c-tpl').value);
+  if(!name){toast('Campaign name required.','error');return;}
+  if(!tpl){toast('Select a template.','error');return;}
+  if(!isTwilioOk()){toast('Configure Twilio in Settings.','error');nav(document.querySelector('[data-page=settings]'));closeM('new-campaign');return;}
+  closeM('new-campaign');
+  await runCampaign(name,target,tpl,industry);
+}
+let campaignCancelled=false;
+
+function cancelCampaign(){
+  campaignCancelled=true;
+  const btn=document.getElementById('cancel-camp-btn');
+  if(btn){btn.textContent='Stopping...';btn.disabled=true;}
+  toast('Campaign stopping after current message...','info');
+}
+
+// Emergency stop — called from campaign card button, works even if modal is closed
+function emergencyStop(){
+  campaignCancelled=true;
+  // Find active campaign and mark it
+  const active=campaigns.find(c=>c.status==='sending');
+  if(active){
+    active.status='cancelled';
+    if(!active.cancelled) active.cancelled=active.total-active.sent;
+    saveData();
+    renderCampaigns();
+  }
+  // Also try to close the sending modal if open
+  const modal=document.getElementById('m-sending');
+  if(modal&&modal.classList.contains('open')){
+    document.getElementById('send-title').textContent='Stopped!';
+    document.getElementById('send-sub').textContent='Campaign cancelled — no more messages will send.';
+    setTimeout(()=>closeM('sending'),2500);
+  }
+  toast(`Campaign stopped! ${active?.sent||0} messages were sent before stopping.`,'info');
+}
+
+async function runCampaign(name,target,tpl,industry=''){
+  // Segment recipients correctly
+  let recipients;
+  if(target==='all'){
+    recipients=contacts.filter(c=>c.status!=='Opt-Out');
+  } else {
+    recipients=contacts.filter(c=>c.status===target);
+  }
+  if(industry) recipients=recipients.filter(c=>(c.industry||'').toLowerCase()===industry.toLowerCase());
+  recipients=recipients.filter(c=>c.phone&&c.phone.trim());
+
+  if(!recipients.length){
+    toast(`No contacts with phone numbers in the "${target}" segment. Make sure contacts are set to the right status first.`,'error');
+    return;
+  }
+
+  campaignCancelled=false;
+  const camp={id:Date.now(),name,target,template:tpl.name,total:recipients.length,sent:0,failed:0,cancelled:0,date:new Date().toLocaleDateString(),status:'sending'};
+  campaigns.unshift(camp);saveData();
+  openM('sending');
+  const pFill=document.getElementById('send-progress'),pDetail=document.getElementById('send-detail'),pTitle=document.getElementById('send-title'),pSub=document.getElementById('send-sub');
+  const cancelBtn=document.getElementById('cancel-camp-btn');
+  if(cancelBtn){cancelBtn.textContent='Stop Campaign';cancelBtn.disabled=false;cancelBtn.style.display='inline-flex';}
+  pSub.textContent=`Sending to ${recipients.length} contacts — click Stop to cancel`;
+  const cfg=getTwilio();
+
+  for(let i=0;i<recipients.length;i++){
+    // Check cancel flag before each message
+    if(campaignCancelled){
+      camp.status='cancelled';
+      camp.cancelled=recipients.length-i;
+      pFill.style.width=((i/recipients.length)*100)+'%';
+      pTitle.textContent='Stopped';
+      pSub.textContent='Campaign cancelled by you';
+      pDetail.textContent=`${camp.sent} sent · ${camp.failed} failed · ${camp.cancelled} not sent`;
+      saveData();renderAll();
+      logActivity(`Campaign "${name}" cancelled — ${camp.sent} sent, ${camp.cancelled} not sent`,'warn');
+      setTimeout(()=>closeM('sending'),3000);
+      toast(`Campaign stopped. ${camp.sent} sent, ${camp.cancelled} contacts not reached.`,'info');
+      return;
+    }
+
+    const c=recipients[i];
+    const msg=buildMessage(tpl.body,c);
+    pDetail.textContent=`${i+1} / ${recipients.length} — ${c.name}`;
+    pFill.style.width=((i/recipients.length)*100)+'%';
+
+    try{
+      const result=await sendSMS(c.phone,msg,cfg);
+      camp.sent++;stats.sent++;
+      c.lastContact=new Date().toLocaleDateString();
+      c.smsSent=(c.smsSent||0)+1;
+      // Auto-advance status: Saved → Opener Sent after first SMS
+      if(c.status==='Saved') c.status='Opener Sent';
+      if(!conversations[c.id]) conversations[c.id]=[];
+      conversations[c.id].push({dir:'out',text:msg,time:new Date().toLocaleTimeString(),ts:Date.now(),sid:result.sid||''});
+      pDetail.textContent=`${i+1} / ${recipients.length} ✓ ${c.name}`;
+      logActivity(`SMS sent to ${c.name}`,'accent');
+    // Track template performance
+    if(tpl?.id){
+      const t=templates.find(x=>x.id==tpl.id);
+      if(t){if(!t.stats) t.stats={sent:0,replies:0};t.stats.sent=(t.stats.sent||0)+1;}
+    }
+    }catch(e){
+      camp.failed++;
+      pDetail.textContent=`${i+1} / ${recipients.length} ✗ ${c.name}: ${e.message.substring(0,50)}`;
+      if(e.message.includes('CORS')){
+        camp.status='blocked';pTitle.textContent='Blocked';pSub.textContent='Host app on Netlify to send SMS. See Settings.';
+        saveData();setTimeout(()=>closeM('sending'),5000);return;
+      }
+    }
+    saveData();
+    await new Promise(r=>setTimeout(r,cfg.delay*1000));
+  }
+
+  camp.status='complete';
+  pFill.style.width='100%';
+  pTitle.textContent='Done!';
+  pDetail.textContent=`${camp.sent} sent · ${camp.failed} failed`;
+  pSub.textContent='Campaign complete';
+  if(cancelBtn) cancelBtn.style.display='none';
+  saveData();renderAll();
+  logActivity(`Campaign "${name}" — ${camp.sent} sent, ${camp.failed} failed`,'green');
+  setTimeout(()=>closeM('sending'),3500);
+  toast(`Done! ${camp.sent} sent, ${camp.failed} failed.`,camp.sent>0?'success':'error');
+}
+async function sendSingleSMS(){
+  const c=contacts.find(x=>x.id===currentDetailId);if(!c) return;
+  const msg=document.getElementById('d-sms-msg')?.value;
+  if(!msg){toast('No message.','error');return;}
+  if(!c.phone){toast('No phone number.','error');return;}
+  if(!isTwilioOk()){toast('Configure Twilio in Settings.','error');return;}
+  try{
+    const result=await sendSMS(c.phone,msg,getTwilio());
+    stats.sent++;c.lastContact=new Date().toLocaleDateString();c.smsSent=(c.smsSent||0)+1;
+    if(!conversations[c.id]) conversations[c.id]=[];
+    conversations[c.id].push({dir:'out',text:msg,time:new Date().toLocaleTimeString(),ts:Date.now(),sid:result.sid||''});
+    logActivity(`SMS sent to ${c.name}`,'accent');
+    saveData();toast(`SMS sent to ${c.name}!`,'success');closeM('contact-detail');renderAll();
+  }catch(e){toast('Failed: '+e.message,'error');}
+}
+// Send from chat panel
+async function sendFromChat(cid){
+  const ta=document.getElementById('chat-input-ta');
+  const msg=ta?.value?.trim();
+  if(!msg){toast('Type a message first.','error');return;}
+  const c=contacts.find(x=>x.id==cid);if(!c) return;
+  if(!c.phone){toast('No phone number for this contact.','error');return;}
+  if(!isTwilioOk()){toast('Configure Twilio in Settings.','error');return;}
+  ta.value='';
+  try{
+    const result=await sendSMS(c.phone,msg,getTwilio());
+    stats.sent++;c.lastContact=new Date().toLocaleDateString();c.smsSent=(c.smsSent||0)+1;
+    if(!conversations[cid]) conversations[cid]=[];
+    conversations[cid].push({dir:'out',text:msg,time:new Date().toLocaleTimeString(),ts:Date.now(),sid:result.sid||''});
+    logActivity(`SMS sent to ${c.name}`,'accent');
+    saveData();
+    openConvo(cid); // re-render chat
+    renderInbox();
+  }catch(e){toast('Send failed: '+e.message,'error');}
+}
+function useQuickReply(cid,body){
+  const c=contacts.find(x=>x.id==cid);if(!c) return;
+  const msg=personalize(body,c);
+  const ta=document.getElementById('chat-input-ta');
+  if(ta) ta.value=msg;
+  ta?.focus();
+}
+
+// ═══════════════════════════════════════════════
+// INBOX + CHAT
+// ═══════════════════════════════════════════════
+function renderInbox(filterQ=''){
+  const keys=Object.keys(conversations);
+  const listEl=document.getElementById('convo-list');
+  if(!keys.length){
+    listEl.innerHTML='<div class="empty" style="padding:28px 14px;font-size:12px">No conversations yet.<br>Send a blast to start conversations.</div>';
+    return;
+  }
+  const sorted=[...keys].sort((a,b)=>{
+    const ua=inboxUnread[a]?1:0,ub=inboxUnread[b]?1:0;
+    if(ua!==ub) return ub-ua;
+    const ma=conversations[a],mb=conversations[b];
+    return (mb[mb.length-1]?.ts||0)-(ma[ma.length-1]?.ts||0);
+  });
+  const q=(filterQ||'').toLowerCase();
+  const stageFilter=document.getElementById('inbox-stage-filter')?.value||'';
+   const filtered=sorted.filter(cid=>{
+    const c=contacts.find(x=>x.id==cid);
+    if(stageFilter && c?.status !== stageFilter) return false;
+    if(!q) return true;
+    return (c?.name||'').toLowerCase().includes(q)||(c?.phone||'').includes(q);
+  });
+  if(!filtered.length){listEl.innerHTML='<div class="empty" style="padding:28px 14px;font-size:12px">No matches.</div>';return;}
+  listEl.innerHTML=filtered.map(cid=>{
+    const c=contacts.find(x=>x.id==cid);
+    const msgs=conversations[cid]||[];
+    const last=msgs[msgs.length-1];
+    const unread=inboxUnread[cid];
+    const isActive=activeConvoId==cid;
+    const bClass='b-'+(c?.status||'cold').toLowerCase().replace(/[\s\-]/g,'');
+    const preview=last?.text?.substring(0,45)||'';
+    const timeStr=last?.time||'';
+    return `<div class="convo-item${isActive?' active':''}" onclick="openConvo(${cid})">
+      ${unread&&!isActive?'<div class="convo-unread"></div>':''}
+      <div class="convo-item-top">
+        <div class="convo-name">${c?.name||'Unknown'}</div>
+        <div class="convo-time">${timeStr}</div>
+      </div>
+      <div class="convo-preview">${last?.dir==='in'?'← ':'→ '}${preview}${preview.length===45?'...':''}</div>
+      <span class="badge ${bClass}" style="font-size:9px;padding:1px 5px">${c?.status||'Cold'}</span>
+    </div>`;
+  }).join('');
+
+  // Update unread badge
+  const unreadCount=Object.keys(inboxUnread).length;
+  const badge=document.getElementById('badge-inbox');
+  if(unreadCount>0){badge.textContent=unreadCount;badge.style.display='inline';}
+  else badge.style.display='none';
+}
+
+function openConvo(cid){
+  activeConvoId=cid;
+  // Clear unread
+  delete inboxUnread[cid];
+  saveData();
+
+  const c=contacts.find(x=>x.id==cid);
+  const msgs=conversations[cid]||[];
+  const panel=document.getElementById('chat-panel-wrap');
+
+  // Build quick reply chips from templates
+  const chips=templates.map(t=>`<div class="qr-chip" onclick="useQuickReply(${cid},\`${t.body.replace(/`/g,'\\`').replace(/\n/g,'\\n')}\`)">${t.name}</div>`).join('');
+
+  // Status options
+  const statuses=["Saved", "Opener Sent", "Engaged", "Warm", "Hot", "Booked", "Follow Up Later", "Called", "Closed", "Lost", "Opt-Out"];
+  const statusSel=`<select onchange="setStatus(${cid},this.value)" style="width:auto;font-size:12px;padding:4px 8px">
+    ${["Saved", "Opener Sent", "Engaged", "Warm", "Hot", "Booked", "Follow Up Later", "Called", "Closed", "Lost", "Opt-Out"].map(s=>`<option${s===c?.status?' selected':''}>${s}</option>`).join('')}
+  </select>`;
+
+  const calendlyBtn=getCalendly()?`<button class="btn btn-sm btn-purple" onclick="sendCalendly(${cid})">Send Calendly</button>`:'';
+
+  panel.innerHTML=`
+    <div class="chat-hdr">
+      <div class="chat-hdr-info">
+        <div>
+          <div class="chat-hdr-name">${c?.name||'Unknown'}</div>
+          <div class="chat-hdr-phone">${c?.phone||'No phone'} · ${c?.industry||'Unknown'}</div>
+        </div>
+      </div>
+      <div class="chat-hdr-actions">
+        ${statusSel}
+        ${calendlyBtn}
+        <button class="btn btn-sm" onclick="openDetail(${cid})">👤 Contact Info</button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-msgs">
+      ${msgs.length?msgs.map(m=>`
+        <div class="bubble-wrap bubble-wrap-${m.dir}">
+          <div class="bubble bubble-${m.dir}">${escHtml(m.text)}</div>
+          <div class="bubble-time">${m.time}</div>
+        </div>`).join(''):'<div style="text-align:center;color:var(--text3);font-size:12px;padding:20px">No messages yet. Send the first one below.</div>'}
+    </div>
+    <div class="chat-footer">
+      <div class="quick-replies">${chips}</div>
+      <div class="chat-compose">
+        <textarea id="chat-input-ta" placeholder="Type a message... or use a template above" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFromChat(${cid})}"></textarea>
+        <button class="btn btn-primary chat-send-btn" onclick="sendFromChat(${cid})">Send</button>
+      </div>
+    </div>`;
+
+  // Scroll to bottom
+  setTimeout(()=>{const el=document.getElementById('chat-msgs');if(el) el.scrollTop=el.scrollHeight;},50);
+
+  // Re-render list to update active state
+  renderInbox(document.getElementById('inbox-q')?.value||'');
+}
+
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+async function sendCalendly(cid){
+  const c=contacts.find(x=>x.id==cid);if(!c) return;
+  const link=getCalendly();if(!link){toast('Add your Calendly link in Settings.','error');return;}
+  const msg=`Here's my booking link — grab a time that works for you: ${link}`;
+  const ta=document.getElementById('chat-input-ta');
+  if(ta){ta.value=msg;ta.focus();}
+}
+
+// ═══════════════════════════════════════════════
+// ANALYTICS RENDER
+// ═══════════════════════════════════════════════
+function renderAnalytics(){
+  const total=contacts.length;
+  const sent=stats.sent||0;
+  const replies=stats.replies||0;
+  const replyRate=sent>0?((replies/sent)*100).toFixed(1)+'%':'0%';
+  const hot=contacts.filter(c=>c.status==='Hot'||c.status==='Booked').length;
+  const closed=contacts.filter(c=>c.status==='Closed').length;
+  const lost=contacts.filter(c=>c.status==='Lost').length;
+  const optout=contacts.filter(c=>c.status==='Opt-Out').length;
+
+  // Top stat cards
+  document.getElementById('anal-stats').innerHTML=`
+    <div class="stat"><div class="stat-label">Total Contacts</div><div class="stat-val" style="color:var(--accent)">${total}</div><div class="stat-sub">in system</div></div>
+    <div class="stat"><div class="stat-label">SMS Sent</div><div class="stat-val">${sent}</div><div class="stat-sub">all time</div></div>
+    <div class="stat"><div class="stat-label">Reply Rate</div><div class="stat-val" style="color:var(--green)">${replyRate}</div><div class="stat-sub">${replies} replies</div></div>
+    <div class="stat"><div class="stat-label">Hot / Booked</div><div class="stat-val" style="color:var(--warn)">${hot}</div><div class="stat-sub">${closed} closed deals</div></div>
+    <div class="stat"><div class="stat-label">Lost / Opt-Out</div><div class="stat-val" style="color:var(--danger)">${lost+optout}</div><div class="stat-sub">${lost} lost · ${optout} opted out</div></div>
+  `;
+
+  // Funnel
+  const cold=contacts.filter(c=>c.status==='Cold').length;
+  const warm=contacts.filter(c=>c.status==='Warm').length;
+  const stages=[
+    {label:'Saved',val:contacts.filter(c=>c.status==='Saved').length,color:'var(--text3)'},
+    {label:'Opener Sent',val:contacts.filter(c=>c.status==='Opener Sent').length,color:'#5bc8e0'},
+    {label:'Engaged',val:contacts.filter(c=>c.status==='Engaged').length,color:'var(--warn)'},
+    {label:'Warm',val:warm,color:'var(--warn)'},
+    {label:'Hot',val:hot,color:'var(--danger)'},
+    {label:'Booked',val:contacts.filter(c=>c.status==='Booked').length,color:'var(--green)'},
+    {label:'Follow Up Later',val:contacts.filter(c=>c.status==='Follow Up Later').length,color:'var(--purple)'},
+    {label:'Closed',val:closed,color:'#00ff9d'},
+    {label:'Lost',val:lost,color:'var(--text3)'},
+  ];
+  const maxVal=Math.max(...stages.map(s=>s.val),1);
+  document.getElementById('funnel-rows').innerHTML=stages.map(s=>`
+    <div class="funnel-row">
+      <div class="funnel-row-label">${s.label}</div>
+      <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:${Math.round(s.val/maxVal*100)}%;background:${s.color}"></div></div>
+      <div class="funnel-row-val">${s.val}</div>
+      <div class="funnel-row-pct">${total?Math.round(s.val/total*100)+'%':'0%'}</div>
+    </div>`).join('');
+
+  // Activity feed
+  const feed=document.getElementById('activity-feed');
+  if(!activityLog.length){feed.innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px 0">No activity yet. Send your first campaign.</div>';return;}
+  const colorMap={accent:'var(--accent)',green:'var(--green)',warn:'var(--warn)',danger:'var(--danger)'};
+  feed.innerHTML=activityLog.slice(0,12).map(a=>`
+    <div class="activity-row">
+      <div class="activity-dot" style="background:${colorMap[a.type]||'var(--accent)'}"></div>
+      <div class="activity-text">${escHtml(a.text)}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>`).join('');
+
+  // Campaign performance
+  const campPerf=document.getElementById('camp-perf-rows');
+  if(!campaigns.length){campPerf.innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px 0">No campaigns yet.</div>';}
+  else{
+    campPerf.innerHTML=campaigns.slice(0,6).map(c=>`
+      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${c.name}</div>
+          <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace">${c.date}</div>
+        </div>
+        <div class="progress-bar" style="margin:0"><div class="progress-fill" style="width:${c.total?Math.round(c.sent/c.total*100):0}%;background:var(--green)"></div></div>
+        <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:3px">${c.sent}/${c.total} sent · ${c.failed} failed</div>
+      </div>`).join('');
+  }
+
+  // Latest replies
+  const replyRows=document.getElementById('latest-reply-rows');
+  const allReplies=[];
+  Object.keys(conversations).forEach(cid=>{
+    const c=contacts.find(x=>x.id==cid);
+    (conversations[cid]||[]).filter(m=>m.dir==='in').forEach(m=>{
+      allReplies.push({name:c?.name||'Unknown',text:m.text,time:m.time,ts:m.ts||0});
+    });
+  });
+  allReplies.sort((a,b)=>b.ts-a.ts);
+  if(!allReplies.length){replyRows.innerHTML='<div style="color:var(--text3);font-size:12px;padding:8px 0">No replies yet. Hit Sync to check for new ones.</div>';}
+  else{
+    replyRows.innerHTML=allReplies.slice(0,8).map(r=>`
+      <div style="padding:7px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+          <div style="font-size:12px;font-weight:600;color:var(--text)">${escHtml(r.name)}</div>
+          <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace">${r.time}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"${escHtml(r.text)}"</div>
+      </div>`).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════════════
+function badge(s){
+  const m={
+    'Saved':'b-saved','Opener Sent':'b-openersent','Engaged':'b-engaged',
+    'Warm':'b-warm','Hot':'b-hot','Booked':'b-booked',
+    'Follow Up Later':'b-followuplater','Called':'b-called',
+    'Closed':'b-closed','Lost':'b-lost','Opt-Out':'b-optout',
+    'Cold':'b-openersent', // legacy
+  };
+  return`<span class="badge ${m[s]||'b-saved'}">${s}</span>`;
+}
+function renderDash(){
+  const sent=stats.sent||0,replies=stats.replies||0;
+  document.getElementById('s-total').textContent=contacts.length;
+  document.getElementById('s-sent').textContent=sent;
+  document.getElementById('s-reply-rate').textContent=sent>0?((replies/sent)*100).toFixed(1)+'%':'0%';
+  document.getElementById('s-reply-sub').textContent=replies+' replies received';
+  document.getElementById('s-hot').textContent=contacts.filter(c=>c.status==='Hot'||c.status==='Booked').length;
+  document.getElementById('s-closed-sub').textContent=contacts.filter(c=>c.status==='Closed').length+' closed deals';
+  document.getElementById('s-optout').textContent=contacts.filter(c=>c.status==='Opt-Out').length;
+  // Show unassigned warning on dashboard
+  const unassignedCount=contacts.filter(x=>!x.status||!VALID_STATUSES||(!['Saved','Opener Sent','Engaged','Warm','Hot','Booked','Follow Up Later','Called','Closed','Lost','Opt-Out'].includes(x.status))).length;
+  const existingWarn=document.getElementById('dash-unassigned-warn');
+  if(unassignedCount>0){
+    if(!existingWarn){
+      const w=document.createElement('div');
+      w.id='dash-unassigned-warn';
+      w.className='alert alert-warn';
+      w.style.cssText='margin-bottom:14px;cursor:pointer';
+      w.innerHTML=`⚠ <strong>${unassignedCount} contacts</strong> have no pipeline stage and won't appear in your pipeline. <span style="text-decoration:underline">Click here to fix all of them in one click.</span>`;
+      w.onclick=()=>{nav(document.querySelector('[data-page=pipeline]'));setTimeout(showBulkStatusModal,200);};
+      const statsGrid=document.querySelector('.stats-grid');
+      if(statsGrid) statsGrid.parentNode.insertBefore(w,statsGrid);
+    }
+  } else if(existingWarn){
+    existingWarn.remove();
+  }
+  document.getElementById('dash-tbody').innerHTML=contacts.slice(0,8).map(c=>`
+    <tr onclick="openDetail(${c.id})">
+      <td class="primary">${c.name}</td><td>${c.industry||'—'}</td>
+      <td class="mono">${c.phone||'—'}</td><td>${badge(c.status)}</td>
+      <td class="mono" style="font-size:11px">${c.lastContact}</td>
+    </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px">No contacts yet. Use Lead Finder to pull leads.</td></tr>';
+}
+function renderContacts(){
+  const q=(document.getElementById('q')?.value||'').toLowerCase();
+  const fs=document.getElementById('f-status')?.value||'';
+  const fi=document.getElementById('f-industry')?.value||'';
+  let list=contacts;
+  if(fs) list=list.filter(c=>c.status===fs);
+  if(fi) list=list.filter(c=>c.industry===fi);
+  if(q) list=list.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q)||(c.industry||'').toLowerCase().includes(q));
+  const industries=[...new Set(contacts.map(c=>c.industry).filter(Boolean))];
+  const sel=document.getElementById('f-industry');
+  if(sel){const cur=sel.value;sel.innerHTML='<option value="">All industries</option>'+industries.map(i=>`<option${i===cur?' selected':''}>${i}</option>`).join('');}
+  document.getElementById('c-tbody').innerHTML=list.map(c=>`
+    <tr>
+      <td><input type="checkbox" class="row-chk" data-id="${c.id}"></td>
+      <td class="primary" onclick="openDetail(${c.id})" style="cursor:pointer">${c.name}</td>
+      <td>${c.industry||'—'}</td><td class="mono">${c.phone||'—'}</td>
+      <td><select onchange="setStatus(${c.id},this.value)" style="width:auto;font-size:12px;padding:4px 8px">
+        ${["Saved", "Opener Sent", "Engaged", "Warm", "Hot", "Booked", "Follow Up Later", "Called", "Closed", "Lost", "Opt-Out"].map(s=>`<option${s===c.status?' selected':''}>${s}</option>`).join('')}
+      </select></td>
+      <td style="font-size:11px;color:${c.status==='Follow Up Later'?'var(--purple)':'var(--text3)'};max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.callbackNote?'⏰ '+c.callbackNote:'—'}</td>
+      <td class="mono" style="font-size:11px;color:var(--text3)">${c.smsSent||0}</td>
+      <td><button class="btn btn-sm" onclick="openDetail(${c.id})">View</button></td>
+    </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:24px">No contacts match filters.</td></tr>';
+}
+function renderPipeline(){
+  checkPipelineHealth();
+  const stages=["Saved", "Opener Sent", "Engaged", "Warm", "Hot", "Booked", "Follow Up Later", "Called", "Lost", "Closed"];
+  document.getElementById('pipe-board').innerHTML=stages.map(s=>{
+    const items=contacts.filter(c=>c.status===s);
+    const colors={Cold:'var(--accent)',Warm:'var(--warn)',Hot:'var(--danger)',Booked:'var(--green)',Called:'var(--purple)',Closed:'#00ff9d',Lost:'var(--text3)'};
+    return`<div class="pipe-col">
+      <div class="pipe-head"><div class="pipe-col-label" style="color:${colors[s]}">${s}</div><div class="pipe-count">${items.length}</div></div>
+      ${items.map(c=>`<div class="pipe-card" onclick="openChatFromPipeline(${c.id})">
+        <div class="pipe-card-name">${c.name}</div>
+        <div class="pipe-card-sub">${c.phone||'no phone'}${c.callbackNote?` · ⏰ ${c.callbackNote}`:''}</div>
+      </div>`).join('')||`<div style="font-size:11px;color:var(--text3);text-align:center;padding:14px">Empty</div>`}
+    </div>`;
+  }).join('');
+}
+function renderCampaigns(){
+  const el=document.getElementById('camp-list');
+  if(!campaigns.length){el.innerHTML='<div class="empty">No campaigns yet.<br>Use Lead Finder → ⚡ Add + SMS Blast for one-click outreach.</div>';return;}
+  // Auto-refresh campaigns page while a send is in progress
+  const hasActive=campaigns.some(c=>c.status==='sending');
+  if(hasActive&&currentPage==='campaigns'){
+    clearTimeout(window._campRefreshTimer);
+    window._campRefreshTimer=setTimeout(()=>renderCampaigns(),2000);
+  }
+  el.innerHTML=campaigns.map(c=>`
+    <div class="camp-card" style="border-color:${c.status==='sending'?'rgba(255,95,95,0.35)':'var(--border)'}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:10px">
+        <div style="min-width:0">
+          <div style="font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</div>
+          <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px">${c.date} · ${c.target} · ${c.template}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          ${c.status==='sending'?`
+            <button onclick="emergencyStop()" style="
+              padding:7px 14px;
+              background:var(--danger);
+              color:#fff;
+              border:none;
+              border-radius:var(--r);
+              font-family:'Syne',sans-serif;
+              font-size:12px;
+              font-weight:700;
+              cursor:pointer;
+              display:flex;
+              align-items:center;
+              gap:6px;
+              animation:pulse-red 1.5s infinite;
+            ">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <rect x="2" y="2" width="8" height="8" rx="1.5" fill="white"/>
+              </svg>
+              STOP CAMPAIGN
+            </button>
+          `:''}
+          <span class="badge ${c.status==='sending'?'b-hot':c.status==='cancelled'?'b-optout':c.status==='blocked'?'b-optout':'b-booked'}" style="${c.status==='sending'?'animation:pulse-badge 1.5s infinite':''}">
+            ${c.status==='sending'?'● SENDING':c.status.toUpperCase()}
+          </span>
+        </div>
+      </div>
+      <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:${c.total?Math.round(c.sent/c.total*100):0}%;background:${c.status==='sending'?'var(--danger)':c.status==='cancelled'?'var(--warn)':'var(--green)'}"></div></div>
+      <div style="display:flex;gap:18px;margin-top:10px;align-items:center">
+        <div style="text-align:center"><div style="font-size:17px;font-weight:700">${c.total}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px">Total</div></div>
+        <div style="text-align:center"><div style="font-size:17px;font-weight:700;color:var(--green)">${c.sent}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px">Sent</div></div>
+        <div style="text-align:center"><div style="font-size:17px;font-weight:700;color:var(--danger)">${c.failed}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px">Failed</div></div>
+        ${c.cancelled?`<div style="text-align:center"><div style="font-size:17px;font-weight:700;color:var(--warn)">${c.cancelled}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px">Stopped</div></div>`:''}
+        ${c.status==='sending'?`<div style="margin-left:auto;font-size:11px;color:var(--danger);font-family:'JetBrains Mono',monospace;animation:pulse-badge 1s infinite">Sending ${c.sent}/${c.total}...</div>`:''}
+      </div>
+    </div>`).join('');
+}
+function renderTemplates(){
+  document.getElementById('tpl-list').innerHTML=templates.map(t=>{
+    const stats=t.stats||{sent:0,replies:0};
+    const replyRate=stats.sent>0?Math.round((stats.replies/stats.sent)*100):null;
+    const rateColor=replyRate>=20?'var(--green)':replyRate>=10?'var(--warn)':'var(--text3)';
+    return `
+    <div class="tpl-card">
+      <div class="tpl-card-name">${t.name}
+        <div style="display:flex;gap:6px"><button class="btn btn-sm" onclick="editTemplate(${t.id})">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteTpl(${t.id})">Delete</button></div>
+      </div>
+      <div class="tpl-card-body">${escHtml(t.body)}</div>
+      <div style="display:flex;gap:16px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;font-family:'JetBrains Mono',monospace;flex-wrap:wrap">
+        <span style="color:var(--text3)">📤 Sent: <strong style="color:var(--text2)">${stats.sent||0}</strong></span>
+        <span style="color:var(--text3)">💬 Replies: <strong style="color:var(--text2)">${stats.replies||0}</strong></span>
+        <span style="color:var(--text3)">📈 Rate: <strong style="color:${rateColor}">${replyRate!==null?replyRate+'%':'—'}</strong></span>
+      </div>
+    </div>`;
+  }).join('')||'<div class="empty">No templates yet.</div>';
+  populateTplSelect('c-tpl');
+}
+function populateTplSelect(id){
+  const sel=document.getElementById(id);if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">-- Select template --</option>'+templates.map(t=>`<option value="${t.id}"${t.id==cur?' selected':''}>${t.name}</option>`).join('');
+}
+// Open chat directly from pipeline card
+window._openChatFn = function(id){
+  // Switch to inbox page
+  const inboxNav = document.querySelector('[data-page=inbox]');
+  nav(inboxNav);
+  // Open the conversation for this contact
+  const cid = id;
+  if(!conversations[cid]) conversations[cid]=[];
+  setTimeout(()=>openConvo(cid),100);
+}
+
+function renderAccountCenter(){
+  // Stats
+  const totalSMS = stats.sent||0;
+  const totalReplies = stats.replies||0;
+  const rate = totalSMS>0?Math.round((totalReplies/totalSMS)*100):null;
+  document.getElementById('ac-total-contacts').textContent = contacts.length;
+  document.getElementById('ac-total-sms').textContent = totalSMS.toLocaleString();
+  document.getElementById('ac-total-replies').textContent = totalReplies.toLocaleString();
+  document.getElementById('ac-reply-rate').textContent = rate!==null?rate+'%':'—';
+
+  // Pipeline breakdown
+  const stages=['Saved','Opener Sent','Engaged','Warm','Hot','Booked','Follow Up Later','Called','Closed','Lost','Opt-Out'];
+  const stageColors={'Warm':'var(--warn)','Hot':'var(--danger)','Booked':'var(--green)','Closed':'var(--accent)','Engaged':'var(--purple,#a78bfa)'};
+  const breakdown = document.getElementById('ac-pipeline-breakdown');
+  breakdown.innerHTML = stages.map(s=>{
+    const count = contacts.filter(c=>c.status===s).length;
+    if(!count) return '';
+    const color = stageColors[s]||'var(--text3)';
+    return `<div style="padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:12px;font-family:'JetBrains Mono',monospace">
+      <span style="color:${color};font-weight:700">${count}</span> <span style="color:var(--text3)">${s}</span>
+    </div>`;
+  }).join('');
+
+  // Template performance
+  const tplPerf = document.getElementById('ac-template-perf');
+  const sorted = [...templates].sort((a,b)=>(b.stats?.sent||0)-(a.stats?.sent||0));
+  tplPerf.innerHTML = sorted.length ? sorted.map(t=>{
+    const s=t.stats||{sent:0,replies:0};
+    const rate=s.sent>0?Math.round((s.replies/s.sent)*100):null;
+    const rateColor=rate>=20?'var(--green)':rate>=10?'var(--warn)':'var(--text3)';
+    const pct=s.sent>0?Math.min(100,Math.round((s.replies/s.sent)*100)):0;
+    return `<div style="padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:12px;font-weight:600;color:var(--text)">${t.name}</span>
+        <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:${rateColor}">${rate!==null?rate+'% reply rate':'No data yet'}</span>
+      </div>
+      <div style="display:flex;gap:12px;font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:6px">
+        <span style="color:var(--text3)">Sent: <strong style="color:var(--text2)">${s.sent}</strong></span>
+        <span style="color:var(--text3)">Replies: <strong style="color:var(--text2)">${s.replies}</strong></span>
+      </div>
+      <div style="height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${rateColor};border-radius:2px;transition:width 0.5s ease"></div>
+      </div>
+    </div>`;
+  }).join('') : '<div style="font-size:13px;color:var(--text3)">Send campaigns to start tracking template performance.</div>';
+
+  // Account info
+  const cfg = getTwilio();
+  document.getElementById('ac-agency-name').textContent = localStorage.getItem('norx-s-agency')||cfg.agency||'Not set';
+  document.getElementById('ac-user-name').textContent = localStorage.getItem('norx-s-name')||'Not set';
+  document.getElementById('ac-twilio-num').textContent = cfg.from||'Not connected';
+  document.getElementById('ac-tpl-count').textContent = templates.length;
+}
+
+function logoutUser(){
+  if(!confirm('Log out of Norx AI?')) return;
+  localStorage.removeItem('norx-auth-token');
+  localStorage.removeItem('norx-user-id');
+  localStorage.removeItem('norx-user-email');
+  localStorage.removeItem('norx-user-plan');
+  localStorage.removeItem('norx-user-meta');
+  window.location.href='/login';
+}
+
+function showUserInfo(){
+  if(!currentUser) return;
+  const meta=JSON.parse(localStorage.getItem('norx-user-meta')||'{}');
+  const name=meta.first_name||currentUser.email?.split('@')[0]||'User';
+  const el=document.getElementById('sidebar-name');
+  if(el) el.textContent=name;
+  const av=document.getElementById('sidebar-avatar');
+  if(av) av.textContent=name[0].toUpperCase();
+  const planEl=document.getElementById('sidebar-plan');
+  if(planEl) planEl.textContent=currentUser.plan||'starter';
+  // Load plan from Supabase profile async
+  getProfile().then(p=>{
+    if(p){
+      currentUser.plan=p.plan||'starter';
+      currentUser.isBeta=p.is_beta||false;
+      if(planEl) planEl.textContent=(p.is_beta?'beta — ':'')+(p.plan||'starter');
+    }
+  });
+}
+
+async function loadDataFromSupabase(){
+  if(!currentUser) return loadData();
+  try{
+    // Load contacts
+    const dbContacts=await sbFetch('contacts?user_id=eq.'+currentUser.id+'&order=created_at.desc&select=*');
+    if(dbContacts&&dbContacts.length>0){
+      contacts=dbContacts.map(r=>({
+        id:r.id,dbId:r.id,
+        name:r.name,industry:r.industry||'',
+        phone:r.phone||'',email:r.email||'',
+        website:r.website||'',status:r.status||'Saved',
+        notes:r.notes||'',callbackNote:r.callback_note||'',
+        smsSent:r.sms_sent||0,lastContact:r.last_contact||'—',
+      }));
+    }else{
+      contacts=JSON.parse(localStorage.getItem('norx-contacts')||'[]');
+    }
+
+    // Load campaigns
+    const dbCamps=await sbFetch('campaigns?user_id=eq.'+currentUser.id+'&order=created_at.desc&select=*');
+    if(dbCamps&&dbCamps.length>0){
+      campaigns=dbCamps.map(r=>({
+        id:r.id,dbId:r.id,name:r.name,target:r.target,
+        template:r.template_name,total:r.total,sent:r.sent,
+        failed:r.failed,cancelled:r.cancelled||0,
+        status:r.status,date:r.campaign_date,
+      }));
+    }else{
+      campaigns=JSON.parse(localStorage.getItem('norx-campaigns')||'[]');
+    }
+
+    // Load templates
+    const dbTpls=await sbFetch('templates?user_id=eq.'+currentUser.id+'&order=created_at.asc&select=*');
+    if(dbTpls&&dbTpls.length>0){
+      templates=dbTpls.map(r=>({id:r.id,dbId:r.id,name:r.name,body:r.body}));
+    }else{
+      templates=JSON.parse(localStorage.getItem('norx-templates')||'[]');
+    }
+
+    // Load stats + convos from localStorage (fast local cache)
+    stats=JSON.parse(localStorage.getItem('norx-stats')||'{"sent":0,"replies":0,"optouts":0}');
+    conversations=JSON.parse(localStorage.getItem('norx-convos')||'{}'  );
+    activityLog=JSON.parse(localStorage.getItem('norx-activity')||'[]');
+    inboxUnread=JSON.parse(localStorage.getItem('norx-unread')||'{}'  );
+
+  }catch(e){
+    console.error('Supabase load failed, using localStorage:',e);
+    loadData();
+  }
+}
+
+function showAppLoader(msg){
+  let el=document.getElementById('app-loader');
+  if(!el){
+    el=document.createElement('div');
+    el.id='app-loader';
+    el.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px';
+    el.innerHTML='<div style="width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite"></div><div style="font-size:13px;color:var(--text3);font-family:JetBrains Mono,monospace" id="app-loader-msg">'+msg+'</div>';
+    document.body.appendChild(el);
+  }else{
+    const m=document.getElementById('app-loader-msg');
+    if(m) m.textContent=msg;
+  }
+}
+
+function hideAppLoader(){
+  const el=document.getElementById('app-loader');
+  if(el) el.remove();
+}
+
+function showOnboarding(){
+  document.getElementById('m-onboarding').classList.add('open');
+}
+
+function obStep1Done(){
+  document.getElementById('ob-step-1').style.display='none';
+  document.getElementById('ob-step-2').style.display='block';
+  // Open settings so they can paste Twilio creds
+  closeM('onboarding');
+  nav(document.querySelector('[data-page=settings]'));
+  toast('Paste your Twilio credentials below and hit Save','info');
+  setTimeout(()=>document.getElementById('m-onboarding').classList.add('open'),100);
+  // After settings save, auto advance
+}
+
+function obSkip(step){
+  if(step===1){document.getElementById('ob-step-1').style.display='none';document.getElementById('ob-step-2').style.display='block';}
+  else if(step===2){document.getElementById('ob-step-2').style.display='none';document.getElementById('ob-step-3').style.display='block';}
+}
+
+function obStep2Done(){
+  document.getElementById('ob-step-2').style.display='none';
+  document.getElementById('ob-step-3').style.display='block';
+}
+
+function finishOnboarding(){
+  localStorage.setItem('norx-onboarded','1');
+  closeM('onboarding');
+  nav(document.querySelector('[data-page=finder]'));
+  toast('Welcome to Norx AI! Start by searching for leads.','success');
+}
+
+async function syncContact(contact){
+  if(!currentUser) return contact;
+  try{
+    const row={
+      user_id:currentUser.id,
+      name:contact.name,industry:contact.industry||'',
+      phone:contact.phone||'',email:contact.email||'',
+      website:contact.website||'',status:contact.status||'Saved',
+      notes:contact.notes||'',callback_note:contact.callbackNote||'',
+      sms_sent:contact.smsSent||0,last_contact:contact.lastContact||null,
+    };
+    if(contact.dbId){
+      await sbFetch('contacts?id=eq.'+contact.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    }else{
+      const res=await sbFetch('contacts',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
+      if(res?.[0]?.id) contact.dbId=res[0].id;
+    }
+  }catch(e){console.warn('syncContact:',e);}
+  return contact;
+}
+
+async function syncAllContacts(){
+  if(!currentUser||!contacts.length) return;
+  const toInsert=contacts.filter(c=>!c.dbId);
+  const toUpdate=contacts.filter(c=>c.dbId);
+  try{
+    if(toInsert.length){
+      const rows=toInsert.map(c=>({
+        user_id:currentUser.id,name:c.name,industry:c.industry||'',
+        phone:c.phone||'',email:c.email||'',website:c.website||'',
+        status:c.status||'Saved',notes:c.notes||'',
+        callback_note:c.callbackNote||'',sms_sent:c.smsSent||0,
+      }));
+      for(let i=0;i<rows.length;i+=50){
+        const res=await sbFetch('contacts',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(rows.slice(i,i+50))});
+        if(res){res.forEach((r,idx)=>{if(contacts[i+idx]) contacts[i+idx].dbId=r.id;});}
+      }
+    }
+    for(const c of toUpdate){
+      await sbFetch('contacts?id=eq.'+c.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({
+        status:c.status,notes:c.notes||'',callback_note:c.callbackNote||'',
+        sms_sent:c.smsSent||0,last_contact:c.lastContact||null,phone:c.phone||'',
+      })});
+    }
+  }catch(e){console.warn('syncAllContacts:',e);}
+}
+
+async function syncTemplate(tpl){
+  if(!currentUser) return tpl;
+  try{
+    const row={user_id:currentUser.id,name:tpl.name,body:tpl.body};
+    if(tpl.dbId){
+      await sbFetch('templates?id=eq.'+tpl.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    }else{
+      const res=await sbFetch('templates',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
+      if(res?.[0]?.id) tpl.dbId=res[0].id;
+    }
+  }catch(e){console.warn('syncTemplate:',e);}
+  return tpl;
+}
+
+async function syncCampaign(camp){
+  if(!currentUser) return camp;
+  try{
+    const row={
+      user_id:currentUser.id,name:camp.name,target:camp.target,
+      template_name:camp.template,total:camp.total,sent:camp.sent,
+      failed:camp.failed,cancelled:camp.cancelled||0,
+      status:camp.status,campaign_date:camp.date,
+    };
+    if(camp.dbId){
+      await sbFetch('campaigns?id=eq.'+camp.dbId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    }else{
+      const res=await sbFetch('campaigns',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)});
+      if(res?.[0]?.id) camp.dbId=res[0].id;
+    }
+  }catch(e){console.warn('syncCampaign:',e);}
+  return camp;
+}
+
+// ── CALL LIST ──────────────────────────────────────────
+
+
+
+
+
+
+
+
+
+
+
+// ══════════════════════════════════════════════
+// CALL LIST — reads directly from contacts array
+// ══════════════════════════════════════════════
+function clOpen(){
+  // Populate industry dropdown fresh each time
+  const ind = document.getElementById('cl-industry');
+  if(ind){
+    const cur = ind.value;
+    const industries = [...new Set(contacts.map(c=>c.industry).filter(Boolean))].sort();
+    ind.innerHTML = '<option value="">All Industries</option>' +
+      industries.map(i=>`<option value="${i}"${i===cur?' selected':''}>${i}</option>`).join('');
+  }
+}
+
+function clSetStatus(id, status){
+  const c = contacts.find(x=>String(x.id)===String(id));
+  if(!c) return;
+  c.callStatus = status;
+  // Mirror to pipeline if relevant
+  if(status==='Called' && !['Closed','Lost','Opt-Out','Booked'].includes(c.status)) c.status='Called';
+  if(status==='Booked') c.status='Booked';
+  if(status==='Opted Out') c.status='Opt-Out';
+  saveData();
+  // Just update that one row's dropdown color
+  const sel = document.getElementById('cl-sel-'+id);
+  if(sel) sel.style.color = clStatusColor(status);
+}
+
+function clStatusColor(s){
+  return s==='Called'?'var(--green)':s==='Booked'?'var(--accent)':s==='Need to Call'?'var(--warn)':s==='No Answer'?'#a78bfa':s==='Opted Out'?'var(--danger)':'var(--text3)';
+}
+
+function clGetStatus(c){
+  if(c.status==='Opt-Out') return 'Opted Out';
+  return c.callStatus||'Not Called';
+}
+
+function clRender(){
+  const list = document.getElementById('cl-list');
+  const countEl = document.getElementById('cl-count');
+  if(!list){ setTimeout(clRender, 100); return; }
+
+  const q = (document.getElementById('cl-search')?.value||'').toLowerCase();
+  const ind = document.getElementById('cl-industry')?.value||'';
+  const stage = document.getElementById('cl-stage')?.value||'';
+  const cs = document.getElementById('cl-callstatus')?.value||'';
+
+  // Read from global contacts array, fallback to localStorage
+  if(!contacts || contacts.length === 0){
+    try{
+      const stored = localStorage.getItem('norx-contacts');
+      if(stored) contacts = JSON.parse(stored);
+    }catch(e){}
+  }
+  let list2 = contacts.filter(c=>{
+    if(ind && c.industry!==ind) return false;
+    if(stage && c.status!==stage) return false;
+    if(cs && clGetStatus(c)!==cs) return false;
+    if(q && !(c.name||'').toLowerCase().includes(q) && !(c.phone||'').includes(q) && !(c.industry||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  // Sort: Need to Call → Not Called → No Answer → Called → Booked → Opted Out
+  const order = {'Need to Call':0,'Not Called':1,'No Answer':2,'Called':3,'Booked':4,'Opted Out':5};
+  list2.sort((a,b)=>(order[clGetStatus(a)]??1)-(order[clGetStatus(b)]??1));
+
+  if(countEl) countEl.textContent = list2.length + ' contact' + (list2.length!==1?'s':'') + ' shown';
+
+  if(!list2.length){
+    list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text3);font-size:13px">' +
+      (contacts.length ? 'No contacts match your filters.' : 'No contacts yet. Use Lead Finder to add contacts.') +
+      '</div>';
+    return;
+  }
+
+  const stageColors = {'Warm':'var(--warn)','Hot':'var(--danger)','Booked':'var(--green)','Closed':'var(--accent)','Engaged':'#a78bfa','Called':'var(--text2)'};
+
+  list.innerHTML = list2.map(c=>{
+    const status = clGetStatus(c);
+    const sColor = clStatusColor(status);
+    const stColor = stageColors[c.status]||'var(--text3)';
+    const phone = c.phone||'';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
+      <div style="flex:1;min-width:140px">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${c.name||'—'}</div>
+        <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:2px">${c.industry||'—'}</div>
+      </div>
+      <div style="min-width:120px">
+        ${phone?`<a href="tel:${phone}" style="font-size:13px;color:var(--accent);text-decoration:none;font-family:'JetBrains Mono',monospace;font-weight:600">${phone}</a>`:'<span style="color:var(--text3);font-size:12px">No phone</span>'}
+      </div>
+      <div style="min-width:100px">
+        <span style="font-size:11px;font-weight:600;color:${stColor};background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:20px;white-space:nowrap">${c.status}</span>
+      </div>
+      <div>
+        <select id="cl-sel-${c.id}" onchange="clSetStatus('${c.id}',this.value)"
+          style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:${sColor};font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;min-width:130px">
+          <option value="Not Called"${status==='Not Called'?' selected':''}>Not Called</option>
+          <option value="Need to Call"${status==='Need to Call'?' selected':''}>📞 Need to Call</option>
+          <option value="No Answer"${status==='No Answer'?' selected':''}>No Answer</option>
+          <option value="Called"${status==='Called'?' selected':''}>✓ Called</option>
+          <option value="Booked"${status==='Booked'?' selected':''}>📅 Booked</option>
+          <option value="Opted Out"${status==='Opted Out'?' selected':''}>Opted Out</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="openChatFromPipeline('${c.id}')" title="Chat" style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer;font-size:12px">💬</button>
+        <button onclick="openDetail('${c.id}')" title="Contact info" style="padding:5px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text2);cursor:pointer;font-size:12px">👤</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAll(){
+  renderDash();
+  if(currentPage==='analytics') renderAnalytics();
+  if(currentPage==='contacts') renderContacts();
+  if(currentPage==='pipeline') renderPipeline();
+  if(currentPage==='campaigns') renderCampaigns();
+  if(currentPage==='inbox') renderInbox();
+  if(currentPage==='templates') renderTemplates();
+  if(currentPage==='calendar') renderCalendar();
+  updateBadges();
+}
+function updateBadges(){
+  document.getElementById('badge-contacts').textContent=contacts.length;
+  const bc=document.getElementById('badge-campaigns');
+  if(campaigns.length){bc.textContent=campaigns.length;bc.style.display='inline';}else bc.style.display='none';
+  const unreadCount=Object.keys(inboxUnread).length;
+  const bi=document.getElementById('badge-inbox');
+  if(unreadCount>0){bi.textContent=unreadCount;bi.style.display='inline';}else bi.style.display='none';
+}
+
+// ═══════════════════════════════════════════════
+// BULK STATUS FIX
+// ═══════════════════════════════════════════════
+const VALID_STATUSES=['Saved','Opener Sent','Engaged','Warm','Hot','Booked','Follow Up Later','Called','Closed','Lost','Opt-Out'];
+
+function showBulkStatusModal(){
+  const unassigned=contacts.filter(c=>!c.status||!VALID_STATUSES.includes(c.status));
+  const legacy=contacts.filter(c=>c.status==='Cold');
+  const total=unassigned.length+legacy.length;
+  if(!total){
+    toast('All contacts already have valid statuses!','success');
+    return;
+  }
+  const summaryEl=document.getElementById('bulk-status-summary');
+  summaryEl.innerHTML=`<strong>${total} contacts</strong> need a status assigned:<br>
+    ${unassigned.length} have no status (blank/null)<br>
+    ${legacy.length} have legacy "Cold" status<br><br>
+    Choose what stage to assign them all to below.`;
+
+  // Smart default: if smsSent > 0, suggest Opener Sent
+  const hasSent=contacts.some(c=>c.smsSent>0);
+  const sel=document.getElementById('bulk-status-target');
+  if(hasSent) sel.value='Opener Sent';
+  else sel.value='Saved';
+
+  openM('bulk-status');
+}
+
+function applyBulkStatus(){
+  const target=document.getElementById('bulk-status-target').value;
+  let count=0;
+  contacts.forEach(c=>{
+    if(!c.status||!VALID_STATUSES.includes(c.status)||c.status==='Cold'){
+      c.status=target;
+      count++;
+    }
+  });
+  saveData();
+  closeM('bulk-status');
+  renderAll();
+  toast(`${count} contacts updated to "${target}".`,'success');
+  logActivity(`Bulk status update: ${count} contacts → ${target}`,'accent');
+}
+
+// Show warning banner on pipeline if contacts have no status
+function checkPipelineHealth(){
+  const unassigned=contacts.filter(c=>!c.status||!VALID_STATUSES.includes(c.status)||c.status==='Cold').length;
+  const warn=document.getElementById('pipeline-warning');
+  if(warn){
+    if(unassigned>0){
+      warn.style.display='block';
+      warn.textContent=`⚠ ${unassigned} contacts have no pipeline stage — click "Fix Missing Statuses"`;
+    } else {
+      warn.style.display='none';
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CONTACT ACTIONS
+// ═══════════════════════════════════════════════
+function addContact(){
+  const name=document.getElementById('n-biz').value.trim();
+  if(!name){toast('Business name required.','error');return;}
+  contacts.unshift({id:Date.now(),name,industry:document.getElementById('n-ind').value.trim()||'Unknown',phone:document.getElementById('n-phone').value.trim(),email:document.getElementById('n-email').value.trim(),website:document.getElementById('n-web').value.trim(),status:document.getElementById('n-status').value,notes:document.getElementById('n-notes').value.trim(),lastContact:'—',smsSent:0});
+  saveData();closeM('add-contact');
+  ['n-biz','n-ind','n-phone','n-email','n-web','n-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderAll();toast('Contact added!','success');
+}
+function importContacts(){
+  const lines=document.getElementById('import-txt').value.split('\n').filter(l=>l.trim());
+  let count=0;
+  lines.forEach(line=>{
+    const p=line.split(',').map(x=>x.trim());
+    if(p[0]){contacts.push({id:Date.now()+Math.random(),name:p[0],industry:p[1]||'Unknown',phone:p[2]||'',email:p[3]||'',website:p[4]||'',status:'Saved',notes:'',lastContact:'—',smsSent:0});count++;}
+  });
+  saveData();closeM('import');document.getElementById('import-txt').value='';renderAll();
+  toast(`Imported ${count} contacts.`,'success');
+}
+function setStatus(id,val){
+  const c=contacts.find(x=>x.id===id||x.id==id);if(!c) return;
+  if(val==='Opt-Out'){stats.optouts++;logActivity(`${c.name} opted out`,'danger');}
+  if(val==='Closed') logActivity(`${c.name} → CLOSED DEAL 🎉`,'green');
+  if(val==='Lost') logActivity(`${c.name} → Lost`,'danger');
+  if(val==='Follow Up Later'){
+    const d=prompt(`Set a follow-up date for ${c.name}:\n(e.g. "May 15" or "2 weeks")\nLeave blank to skip.`);
+    if(d) c.callbackNote=d;
+    logActivity(`${c.name} → Follow Up Later${d?' ('+d+')':''}`,'purple');
+  }
+  c.status=val;c.lastContact=new Date().toLocaleDateString();
+  saveData();renderAll();
+  if(activeConvoId==id) openConvo(id);
+}
+function bulkDelete(){
+  const ids=[...document.querySelectorAll('.row-chk:checked')].map(el=>+el.dataset.id);
+  if(!ids.length){toast('Select contacts first.','error');return;}
+  if(!confirm(`Delete ${ids.length} contact(s)?`)) return;
+  contacts=contacts.filter(c=>!ids.includes(c.id));
+  saveData();renderAll();toast(`${ids.length} deleted.`,'success');
+}
+function toggleAll(cb){document.querySelectorAll('.row-chk').forEach(c=>c.checked=cb.checked);}
+function exportCSV(){
+  const rows=[['Name','Industry','Phone','Email','Website','Status','SMS Sent','Notes','Last Contacted']];
+  contacts.forEach(c=>rows.push([c.name,c.industry,c.phone,c.email,c.website,c.status,c.smsSent||0,c.notes,c.lastContact]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='norx-contacts.csv';a.click();
+  toast('CSV exported!','success');
+}
+window._openDetailFn = function(id){
+  const c=contacts.find(x=>x.id===id||x.id==id);if(!c) return;
+  currentDetailId=id;
+  document.getElementById('d-title').textContent=c.name;
+  document.getElementById('d-body').innerHTML=`
+    <div class="grid-2" style="margin-bottom:14px">
+      <table style="font-size:13px;width:100%">
+        <tr><td style="color:var(--text3);padding:4px 0;width:80px">Industry</td><td>${c.industry||'—'}</td></tr>
+        <tr><td style="color:var(--text3);padding:4px 0">Phone</td><td class="mono">${c.phone||'<span style="color:var(--danger)">No phone</span>'}</td></tr>
+        <tr><td style="color:var(--text3);padding:4px 0">Email</td><td class="mono" style="font-size:11px">${c.email||'—'}</td></tr>
+        <tr><td style="color:var(--text3);padding:4px 0">Website</td><td style="font-size:11px">${c.website||'—'}</td></tr>
+        <tr><td style="color:var(--text3);padding:4px 0">Status</td><td>${badge(c.status)}</td></tr>
+        <tr><td style="color:var(--text3);padding:4px 0">SMS Sent</td><td class="mono">${c.smsSent||0}</td></tr>
+      </table>
+      <div>
+        <label class="form-label">Update Status</label>
+        <select onchange="setStatus(${id},this.value)" style="width:auto;margin-bottom:10px">
+          ${['Cold','Warm','Hot','Booked','Called','Closed','Lost','Opt-Out'].map(s=>`<option${s===c.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+        <label class="form-label">Phone (E.164)</label>
+        <input type="text" id="d-phone-edit" value="${c.phone||''}" placeholder="+19495001234" style="margin-bottom:8px">
+        <button class="btn btn-sm" onclick="updatePhone(${id})">Update Phone</button>
+      </div>
+    </div>
+    <label class="form-label">Quick SMS</label>
+    <select id="d-tpl-sel" onchange="updateDetailMsg(${id})" style="margin-bottom:7px">
+      ${templates.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}
+    </select>
+    <textarea id="d-sms-msg" style="font-family:'JetBrains Mono',monospace;font-size:12px;min-height:80px">${templates[0]?buildMessage(templates[0].body,c):''}</textarea>
+    <label class="form-label" style="margin-top:10px">Notes</label>
+    <textarea id="d-notes" style="min-height:55px">${c.notes||''}</textarea>
+    <button class="btn btn-sm" onclick="saveNotes(${id})" style="margin-top:7px">Save Notes</button>`;
+  openM('contact-detail');
+}
+function updatePhone(id){const c=contacts.find(x=>x.id===id);if(!c) return;c.phone=document.getElementById('d-phone-edit').value.trim();saveData();toast('Phone updated.','success');}
+function updateDetailMsg(id){const c=contacts.find(x=>x.id===id);const tpl=templates.find(t=>t.id==document.getElementById('d-tpl-sel').value);if(tpl&&c) document.getElementById('d-sms-msg').value=buildMessage(tpl.body,c);}
+function saveNotes(id){const c=contacts.find(x=>x.id===id);if(c){c.notes=document.getElementById('d-notes').value;saveData();toast('Notes saved.','success');}}
+
+// ═══════════════════════════════════════════════
+// TEMPLATES
+// ═══════════════════════════════════════════════
+function saveTemplate(){
+  const name=document.getElementById('t-name').value.trim(),body=document.getElementById('t-body').value.trim();
+  if(!name||!body){toast('Name and message required.','error');return;}
+  if(editTplId){const t=templates.find(x=>x.id===editTplId);if(t){t.name=name;t.body=body;}editTplId=null;}
+  else templates.push({id:Date.now(),name,body});
+  saveData();closeM('new-template');
+  document.getElementById('t-name').value='';document.getElementById('t-body').value='';
+  document.getElementById('tpl-modal-title').textContent='New Template';
+  renderTemplates();toast('Template saved!','success');
+}
+function editTemplate(id){
+  const t=templates.find(x=>x.id===id);if(!t) return;
+  editTplId=id;document.getElementById('tpl-modal-title').textContent='Edit Template';
+  document.getElementById('t-name').value=t.name;document.getElementById('t-body').value=t.body;openM('new-template');
+}
+function deleteTpl(id){
+  if(!confirm('Delete?')) return;
+  templates=templates.filter(t=>t.id!==id);saveData();renderTemplates();toast('Deleted.','success');
+}
+
+// ═══════════════════════════════════════════════
+// CAMPAIGN HELPERS
+// ═══════════════════════════════════════════════
+function updateCampCount(){
+  const target=document.getElementById('c-target').value;
+  const industry=document.getElementById('c-industry')?.value||'';
+  const delay=getTwilio().delay||3;
+  let pool=target==='all'?contacts.filter(c=>c.status!=='Opt-Out'&&c.status!=='Lost'&&c.status!=='Closed'):contacts.filter(c=>c.status===target);
+  if(industry) pool=pool.filter(c=>(c.industry||'').toLowerCase()===industry.toLowerCase());
+  const count=pool.filter(c=>c.phone&&c.phone.trim()).length;
+  document.getElementById('c-count').textContent=count;
+  const secs=count*delay;
+  document.getElementById('c-time').textContent=secs>=60?Math.ceil(secs/60)+'m':secs+'s';
+  document.getElementById('c-cost').textContent='$'+((count*0.0079)+1).toFixed(2);
+  updateCampPreview();
+  const w=document.getElementById('camp-warn');if(w) w.style.display=isTwilioOk()?'none':'block';
+}
+function updateCampPreview(){
+  const tpl=templates.find(t=>t.id==document.getElementById('c-tpl').value);
+  const sample=contacts.find(c=>c.status!=='Opt-Out')||contacts[0];
+  const el=document.getElementById('c-preview');
+  if(!tpl||!sample){el.textContent='Select a template above';return;}
+  el.textContent=buildMessage(tpl.body,sample);
+}
+
+// ═══════════════════════════════════════════════
+// LEAD FINDER
+// ═══════════════════════════════════════════════
+function setFinderProg(msg){const el=document.getElementById('finder-prog');if(el) el.textContent=msg;}
+function formatPhone(phone){
+  if(!phone) return '';
+  if(phone.startsWith('+')) return phone.replace(/[\s\-\(\)]/g,'');
+  const digits=phone.replace(/\D/g,'');
+  if(digits.length===10) return '+1'+digits;
+  if(digits.length===11&&digits.startsWith('1')) return '+'+digits;
+  return '+'+digits;
+}
+function buildSearchGrid(lat,lng,radiusM,gridCount){
+  const centers=[{lat,lng}];
+  if(gridCount<=1) return centers;
+  const latOffset=(radiusM*1.2)/111320;
+  const lngOffset=(radiusM*1.2)/(111320*Math.cos(lat*Math.PI/180));
+  if(gridCount>=2){centers.push({lat:lat+latOffset,lng},{lat:lat-latOffset,lng},{lat,lng:lng+lngOffset},{lat,lng:lng-lngOffset});}
+  if(gridCount>=4){centers.push({lat:lat+latOffset,lng:lng+lngOffset},{lat:lat+latOffset,lng:lng-lngOffset},{lat:lat-latOffset,lng:lng+lngOffset},{lat:lat-latOffset,lng:lng-lngOffset});}
+  if(gridCount>=7){const lo2=latOffset*2,ln2=lngOffset*2;centers.push({lat:lat+lo2,lng},{lat:lat-lo2,lng},{lat,lng:lng+ln2},{lat,lng:lng-ln2},{lat:lat+lo2,lng:lng+ln2},{lat:lat-lo2,lng:lng-ln2});}
+  return centers;
+}
+async function searchLeads(){
+  const niche=document.getElementById('f-niche').value.trim();
+  const loc=document.getElementById('f-location').value.trim();
+  const gkey=getGKey();
+  if(!niche||!loc){toast('Enter a niche and location.','error');return;}
+  if(!gkey){document.getElementById('finder-api-warn').style.display='block';toast('Add your Google Places API key in Settings.','error');return;}
+  document.getElementById('finder-api-warn').style.display='none';
+  document.getElementById('finder-results').style.display='block';
+  document.getElementById('leads-body').innerHTML=`<div class="finder-loading"><div class="spinner"></div><div>Finding <strong style="color:var(--text)">${niche}</strong> near <strong style="color:var(--text)">${loc}</strong></div><div class="finder-progress" id="finder-prog">Geocoding location...</div></div>`;
+  const btn=document.getElementById('search-btn');btn.disabled=true;
+  const minR=parseInt(document.getElementById('f-min-rev').value)||0;
+  const maxR=parseInt(document.getElementById('f-max-rev').value)||999999;
+  const minRat=parseFloat(document.getElementById('f-min-rat').value)||0;
+  const hasPhone=document.getElementById('f-has-phone').value==='1';
+  const radiusVal=document.getElementById('f-radius').value;
+  const radiusLabel=document.getElementById('f-radius').options[document.getElementById('f-radius').selectedIndex].text;
+  const parts=radiusVal.split('_');
+  const radiusMeters=parseInt(parts[0]);
+  const gridCount=parts[1]?parseInt(parts[1]):1;
+  const fieldMask=['places.id','places.displayName','places.formattedAddress','places.nationalPhoneNumber','places.internationalPhoneNumber','places.websiteUri','places.rating','places.userRatingCount','places.shortFormattedAddress'].join(',');
+  try{
+    setFinderProg('Geocoding your location...');
+    const geoResp=await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(loc)}&key=${gkey}`);
+    const geoData=await geoResp.json();
+    if(!geoData.results||!geoData.results.length){document.getElementById('leads-body').innerHTML=`<div class="empty">Could not find location: "${loc}"<br>Try a more specific address or zip code.</div>`;btn.disabled=false;return;}
+    const {lat,lng}=geoData.results[0].geometry.location;
+    const resolvedAddr=geoData.results[0].formatted_address;
+    setFinderProg(`Located: ${resolvedAddr}`);
+    const searchCenters=buildSearchGrid(lat,lng,radiusMeters,gridCount);
+    const allPlaces=[];const seenIds=new Set();let totalSearches=0;
+    for(const center of searchCenters){
+      let pageToken=null;let page=0;const maxPages=3;
+      do{
+        totalSearches++;
+        setFinderProg(`Search ${totalSearches} across ${searchCenters.length} grid points — ${allPlaces.length} unique leads found...`);
+        const body={textQuery:niche,maxResultCount:20,languageCode:'en',locationBias:{circle:{center:{latitude:center.lat,longitude:center.lng},radius:radiusMeters}}};
+        if(pageToken) body.pageToken=pageToken;
+        const resp=await fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':gkey,'X-Goog-FieldMask':fieldMask},body:JSON.stringify(body)});
+        const data=await resp.json();
+        if(data.error){document.getElementById('leads-body').innerHTML=`<div class="empty">API Error: ${data.error.message}<br>Make sure Places API (New) and Geocoding API are enabled.</div>`;btn.disabled=false;return;}
+        (data.places||[]).forEach(p=>{if(!seenIds.has(p.id)){seenIds.add(p.id);allPlaces.push(p);}});
+        pageToken=data.nextPageToken||null;page++;
+        if(pageToken&&page<maxPages) await new Promise(r=>setTimeout(r,300));
+      }while(pageToken&&page<maxPages);
+      if(searchCenters.indexOf(center)<searchCenters.length-1) await new Promise(r=>setTimeout(r,200));
+    }
+    setFinderProg(`${allPlaces.length} total — applying filters...`);
+    const filtered=allPlaces.filter(p=>{
+      const rc=p.userRatingCount||0,rat=p.rating||0;
+      const phone=p.internationalPhoneNumber||p.nationalPhoneNumber||'';
+      if(hasPhone&&!phone) return false;
+      return rc>=minR&&rc<=maxR&&rat>=minRat;
+    });
+    finderResults=filtered.map(p=>({placeId:p.id,name:p.displayName?.text||'Unknown',phone:formatPhone(p.internationalPhoneNumber||p.nationalPhoneNumber||''),website:p.websiteUri||'',address:p.shortFormattedAddress||p.formattedAddress||'',rating:p.rating||0,reviews:p.userRatingCount||0,industry:niche.charAt(0).toUpperCase()+niche.slice(1)}));
+    renderLeads();
+    toast(`Found ${finderResults.length} leads within ${radiusLabel} of ${loc}.`,'success');
+  }catch(e){document.getElementById('leads-body').innerHTML=`<div class="empty">Search failed: ${e.message}<br>Make sure Places API (New) and Geocoding API are enabled in Google Console.</div>`;}
+  btn.disabled=false;
+}
+function renderLeads(){
+  document.getElementById('finder-count').textContent=`${finderResults.length} leads found`;
+  if(!finderResults.length){document.getElementById('leads-body').innerHTML='<div class="empty">No results match your filters.</div>';return;}
+  document.getElementById('leads-body').innerHTML=finderResults.map((r,i)=>`
+    <div class="lead-row">
+      <div><input type="checkbox" class="lead-chk" data-i="${i}" checked></div>
+      <div><div class="lead-name">${r.name}</div><div class="lead-addr">${r.address}</div></div>
+      <div class="lead-phone">${r.phone||'<span style="color:var(--text3)">No phone</span>'}</div>
+      <div>${r.website?`<a href="${r.website}" target="_blank" class="lead-site">${r.website.replace(/^https?:\/\//,'').split('/')[0]}</a>`:'<span style="color:var(--text3);font-size:11px">—</span>'}</div>
+      <div class="stars">${r.rating?'★ '+r.rating.toFixed(1):'—'}</div>
+      <div class="mono" style="font-size:12px">${r.reviews}</div>
+      <div><button class="btn btn-sm" onclick="addSingleLead(${i})">Add</button></div>
+    </div>`).join('');
+}
+function toggleLeads(cb){document.querySelectorAll('.lead-chk').forEach(c=>c.checked=cb.checked);}
+function getSelectedLeads(){return[...document.querySelectorAll('.lead-chk:checked')].map(el=>finderResults[+el.dataset.i]).filter(Boolean);}
+function addLeadToContacts(r){
+  if(contacts.find(c=>c.name===r.name)) return false;
+  contacts.unshift({id:Date.now()+Math.random(),name:r.name,industry:r.industry,phone:r.phone,email:'',website:r.website,status:'Saved',notes:`Rating: ${r.rating} · ${r.reviews} reviews · ${r.address}`,lastContact:'—',smsSent:0});
+  return true;
+}
+function addSingleLead(i){const r=finderResults[i];if(!r) return;if(addLeadToContacts(r)){saveData();renderAll();toast(`${r.name} added.`,'success');}else toast(`${r.name} already exists.`,'info');}
+function addSelectedLeads(){
+  const sel=getSelectedLeads();if(!sel.length){toast('No leads selected.','error');return;}
+  let added=0;sel.forEach(r=>{if(addLeadToContacts(r))added++;});
+  saveData();renderAll();toast(`${added} leads added.`,'success');
+}
+function addAndBlast(){
+  const sel=getSelectedLeads();if(!sel.length){toast('No leads selected.','error');return;}
+  let added=0;sel.forEach(r=>{if(addLeadToContacts(r))added++;});
+  saveData();renderAll();
+  populateTplSelect('fb-tpl');
+  document.getElementById('fb-name').value=`Lead Finder — ${document.getElementById('f-niche').value} — ${new Date().toLocaleDateString()}`;
+  document.getElementById('finder-blast-info').textContent=`${added} new leads added (${sel.length-added} already existed). Choose a template and blast.`;
+  document.getElementById('fb-preview').textContent='Select a template above';
+  openM('finder-blast');
+}
+function updateFbPreview(){const tpl=templates.find(t=>t.id==document.getElementById('fb-tpl').value);const sample=contacts[0];const el=document.getElementById('fb-preview');if(!tpl||!sample){el.textContent='Select a template above';return;}el.textContent=buildMessage(tpl.body,sample);}
+async function execFinderBlast(){
+  const name=document.getElementById('fb-name').value.trim();
+  const tpl=templates.find(t=>t.id==document.getElementById('fb-tpl').value);
+  if(!name){toast('Enter a campaign name.','error');return;}
+  if(!tpl){toast('Select a template.','error');return;}
+  if(!isTwilioOk()){toast('Configure Twilio in Settings.','error');nav(document.querySelector('[data-page=settings]'));closeM('finder-blast');return;}
+  closeM('finder-blast');
+  await runCampaign(name,'Cold',tpl,'');
+}
+
+// ═══════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════
+window._navFn = function(el){
+  const page=el.dataset.page;
+  // Hide all pages
+  document.querySelectorAll('[id^="pg-"]').forEach(p=>{p.style.display='none';});
+  const pg=document.getElementById('pg-'+page);
+  if(pg){
+    pg.style.display=(page==='inbox'||page==='calllist')?'flex':'block';
+  }
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  const titles={dashboard:'Dashboard',analytics:'Analytics',contacts:'Contacts',pipeline:'Pipeline',inbox:'Inbox',finder:'Lead Finder',campaigns:'Campaigns',templates:'Templates',calendar:'Calendar',settings:'Settings'};
+  document.getElementById('page-title').textContent=titles[page]||page;
+  currentPage=page;renderAll();
+  if(page==='finder') document.getElementById('finder-api-warn').style.display=getGKey()?'none':'block';
+  if(page==='inbox') renderInbox();
+  if(page==='calllist'){ clOpen(); clRender(); }
+}
+
+// ═══════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════
+function openM(id){
+  document.getElementById('m-'+id).classList.add('open');
+  if(id==='new-campaign'){
+    populateTplSelect('c-tpl');
+    const industries=[...new Set(contacts.map(c=>c.industry).filter(Boolean))].sort();
+    const sel=document.getElementById('c-industry');
+    if(sel){const cur=sel.value;sel.innerHTML='<option value="">All industries</option>'+industries.map(i=>`<option value="${i}"${i===cur?' selected':''}>${i}</option>`).join('');}
+    updateCampCount();
+  }
+}
+function closeM(id){document.getElementById('m-'+id).classList.remove('open');}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open'));});
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function toast(msg,type='info'){
+  const el=document.createElement('div');
+  el.className=`toast toast-${type}`;
+  el.innerHTML=`<span>${type==='success'?'✓':type==='error'?'✕':'ℹ'}</span> ${msg}`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity 0.3s';setTimeout(()=>el.remove(),300);},3500);
+}
+
+// ═══════════════════════════════════════════════
+// FULL BACKUP EXPORT / IMPORT
+// ═══════════════════════════════════════════════
+function exportFullBackup(){
+  const backup={
+    version:2,
+    exportedAt:new Date().toISOString(),
+    exportedFrom:window.location.hostname,
+    contacts,
+    templates,
+    campaigns,
+    conversations,
+    stats,
+    activityLog,
+    inboxUnread,
+    settings:{},
+  };
+  // Include all settings keys
+  const settingKeys=['s-sid','s-token','s-from','s-delay','s-name','s-agency','s-optout-msg','s-gkey','s-calendly','s-gcal'];
+  settingKeys.forEach(k=>{
+    const val=localStorage.getItem('norx-'+k);
+    if(val) backup.settings[k]=val;
+  });
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`norxai-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  toast(`Backup exported — ${contacts.length} contacts, ${Object.keys(conversations).length} conversations.`,'success');
+}
+
+function importFullBackup(input){
+  const file=input.files[0];
+  if(!file){return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const backup=JSON.parse(e.target.result);
+      if(!backup.contacts&&!backup.conversations){
+        toast('Invalid backup file — make sure you selected a NorxAI backup .json file.','error');
+        return;
+      }
+      const existingCount=contacts.length;
+      const incomingCount=(backup.contacts||[]).length;
+
+      // Merge contacts — add any that don't already exist by name
+      let added=0,updated=0;
+      (backup.contacts||[]).forEach(incoming=>{
+        const existing=contacts.find(c=>c.name===incoming.name||(c.phone&&c.phone===incoming.phone));
+        if(!existing){
+          contacts.push(incoming);
+          added++;
+        } else {
+          // Update phone/email/status if incoming has more data
+          if(!existing.phone&&incoming.phone){existing.phone=incoming.phone;updated++;}
+          if(!existing.email&&incoming.email){existing.email=incoming.email;}
+          if(incoming.status&&incoming.status!=='Cold') existing.status=incoming.status;
+          if(incoming.smsSent>0) existing.smsSent=Math.max(existing.smsSent||0,incoming.smsSent);
+          if(incoming.notes&&!existing.notes) existing.notes=incoming.notes;
+        }
+      });
+
+      // Merge conversations — add messages that don't exist yet
+      let newMsgs=0;
+      Object.keys(backup.conversations||{}).forEach(cid=>{
+        // Try to find matching contact by id, then by name/phone
+        const incomingContact=(backup.contacts||[]).find(c=>c.id==cid);
+        let localContact=contacts.find(c=>c.id==cid);
+        if(!localContact&&incomingContact){
+          localContact=contacts.find(c=>c.name===incomingContact.name||(c.phone&&c.phone===incomingContact.phone));
+        }
+        const targetId=localContact?localContact.id:cid;
+        if(!conversations[targetId]) conversations[targetId]=[];
+        const existingSids=new Set(conversations[targetId].map(m=>m.sid).filter(Boolean));
+        (backup.conversations[cid]||[]).forEach(msg=>{
+          if(!msg.sid||!existingSids.has(msg.sid)){
+            conversations[targetId].push(msg);
+            newMsgs++;
+          }
+        });
+      });
+
+      // Merge campaigns
+      const existingCampIds=new Set(campaigns.map(c=>c.id));
+      (backup.campaigns||[]).forEach(c=>{if(!existingCampIds.has(c.id)) campaigns.push(c);});
+
+      // Merge stats (take max)
+      if(backup.stats){
+        stats.sent=Math.max(stats.sent||0,backup.stats.sent||0);
+        stats.replies=Math.max(stats.replies||0,backup.stats.replies||0);
+        stats.optouts=Math.max(stats.optouts||0,backup.stats.optouts||0);
+      }
+
+      // Merge activity log
+      if(backup.activityLog){
+        activityLog=[...activityLog,...backup.activityLog];
+        activityLog.sort((a,b)=>(b.ts||0)-(a.ts||0));
+        activityLog=activityLog.slice(0,200);
+      }
+
+      // Merge unread
+      Object.assign(inboxUnread,backup.inboxUnread||{});
+
+      // Restore settings only if current ones are empty
+      if(backup.settings){
+        Object.keys(backup.settings).forEach(k=>{
+          if(!localStorage.getItem('norx-'+k)){
+            localStorage.setItem('norx-'+k,backup.settings[k]);
+          }
+        });
+        loadSettings();
+      }
+
+      saveData();
+      renderAll();
+      updateStatuses();
+
+      const msg=`Backup restored! ${added} contacts added, ${updated} updated, ${newMsgs} messages imported. Total: ${contacts.length} contacts.`;
+      toast(msg,'success');
+      alert(msg);
+
+    }catch(err){
+      toast('Failed to parse backup file: '+err.message,'error');
+    }
+  };
+  reader.readAsText(file);
+  // Reset input so same file can be re-selected
+  input.value='';
+}
+
+init();
+</script>
+</body>
+</html>
