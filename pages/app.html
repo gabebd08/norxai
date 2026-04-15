@@ -276,7 +276,7 @@ select option{background:var(--bg3);color:var(--text)}
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 3h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M2 3l6 5.5L14 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
       Inbox <span class="nav-badge nav-badge-red" id="badge-inbox" style="display:none">0</span>
     </div>
-<div class="nav-item" data-page="calllist" onclick="nav(this);clOpen()">
+<div class="nav-item" data-page="calllist" onclick="nav(this)">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 2h2.5l1 3-1.5 1a8 8 0 004 4l1-1.5 3 1V13a1 1 0 01-1 1C6 14 2 10 2 4a1 1 0 011-2z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       Call List
     </div>
@@ -2215,10 +2215,6 @@ async function syncCampaign(camp){
 // CALL LIST — reads directly from contacts array
 // ══════════════════════════════════════════════
 function clOpen(){
-  // Force page visible
-  const pg = document.getElementById('pg-calllist');
-  if(pg) pg.style.display='flex';
-  
   // Populate industry dropdown fresh each time
   const ind = document.getElementById('cl-industry');
   if(ind){
@@ -2227,7 +2223,6 @@ function clOpen(){
     ind.innerHTML = '<option value="">All Industries</option>' +
       industries.map(i=>`<option value="${i}"${i===cur?' selected':''}>${i}</option>`).join('');
   }
-  clRender();
 }
 
 function clSetStatus(id, status){
@@ -2254,10 +2249,6 @@ function clGetStatus(c){
 }
 
 function clRender(){
-  // Force page visible first
-  const pg = document.getElementById('pg-calllist');
-  if(pg && pg.style.display==='none') pg.style.display='flex';
-  
   const list = document.getElementById('cl-list');
   const countEl = document.getElementById('cl-count');
   if(!list){ setTimeout(clRender, 100); return; }
@@ -2693,7 +2684,7 @@ window._navFn = function(el){
   currentPage=page;renderAll();
   if(page==='finder') document.getElementById('finder-api-warn').style.display=getGKey()?'none':'block';
   if(page==='inbox') renderInbox();
-  if(page==='calllist') clRender();
+  if(page==='calllist'){ clOpen(); clRender(); }
 }
 
 // ═══════════════════════════════════════════════
